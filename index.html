@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- PWA → Aplicativo Móvel -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2e7d32">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="PDV Hortifrúti">
+    <link rel="apple-touch-icon" href="icone-192.svg">
+    <title>Hortifruti PDV — Ponto de Venda</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="cabecalho">
+            <div class="logo">
+                <span class="fruta">🍉</span>
+                <h1>Hortifruti <span>PDV</span></h1>
+                <span class="fruta">🍎</span>
+            </div>
+            <div class="navegacao">
+                <a href="gestao.html">⚙️ Gestão <span class="teclas-atalho">[F9]</span></a>
+            </div>
+        </header>
+        <main class="conteudo-principal">
+            <section class="area-produtos">
+                <div class="busca">
+                    <input type="text" id="campo-busca" placeholder="🔍 Buscar produto... [F2]" autofocus>
+                    <button class="btn-acao btn-primario" id="btn-buscar">Buscar</button>
+                </div>
+                <div class="categorias" id="categorias">
+                    <button class="cat-ativo" data-cat="todos">Todos</button>
+                    <button data-cat="frutas">Frutas</button>
+                    <button data-cat="verduras">Verduras</button>
+                    <button data-cat="legumes">Legumes</button>
+                    <button data-cat="outros">Outros</button>
+                </div>
+                <div class="grade-produtos" id="grade-produtos">
+                    <!-- Produtos carregados via JS -->
+                </div>
+            </section>
+            <aside class="area-venda">
+                <div class="carrinho">
+                    <h3>🛒 Carrinho <span id="qtd-itens">(0)</span></h3>
+                    <div class="lista-itens" id="lista-itens">
+                        <p class="vazio">Nenhum produto adicionado</p>
+                    </div>
+                    <div class="peso-balanza" id="area-peso" style="display: none;">
+                        <label>Peso (kg):</label>
+                        <input type="number" step="0.001" id="peso-input" placeholder="0.000">
+                        <button id="btn-aplicar-peso">Aplicar</button>
+                    </div>
+                    <div class="resumo">
+                        <div class="linha-resumo">
+                            <span>Subtotal</span>
+                            <span id="subtotal">R$ 0,00</span>
+                        </div>
+                        <div class="linha-resumo">
+                            <span>Desconto</span>
+                            <span id="desconto-valor">R$ 0,00</span>
+                        </div>
+                        <div class="linha-resumo total">
+                            <span>Total</span>
+                            <span id="total">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="pagamento">
+                    <h4>Forma de Pagamento</h4>
+                    <div class="botoes-pagamento" id="botoes-pag">
+                        <button class="btn-pag" data-pag="dinheiro">💵 Dinheiro</button>
+                        <button class="btn-pag" data-pag="alimentacao">🍽️ Alim.</button>
+                        <button class="btn-pag" data-pag="pix">📱 PIX</button>
+                        <button class="btn-pag" data-pag="cartao">💳 Cartão</button>
+                        <button class="btn-pag" data-pag="crediario">📝 Crediário</button>
+                    </div>
+                    <div class="botoes-acao">
+                        <button class="btn-cancelar" id="btn-cancelar">🗑️ Cancelar</button>
+                        <button class="btn-finalizar" id="btn-finalizar">✅ Finalizar Venda</button>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
