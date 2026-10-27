@@ -1,3 +1,14 @@
+// ===== FUNÇÕES DE SEGURANÇA =====
+function escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[char]));
+}
+function numeroValido(value, minimo = 0) {
+    const n = Number(value);
+    return Number.isFinite(n) && n >= minimo ? n : null;
+}
+
 // ===== FUNÇÕES DE SEGURANÇA PARA SALVAR/CARREGAR DADOS =====
 function salvarDados(chave, valor) {
     try {
@@ -42,8 +53,25 @@ let produtoParaPesar = null;
 
 // ===== SALVAR =====
 function salvarTudo() {
-    salvarDados('produtos', produtos);
-    salvarDados('historicoVendas', historicoVendas);
+    let produtosAntigos, vendasAntigas;
+    try {
+        produtosAntigos = localStorage.getItem('produtos');
+        vendasAntigas = localStorage.getItem('historicoVendas');
+        localStorage.setItem('produtos', JSON.stringify(produtos));
+        localStorage.setItem('historicoVendas', JSON.stringify(historicoVendas));
+        return true;
+    } catch (e) {
+        try {
+            if (produtosAntigos == null) localStorage.removeItem('produtos');
+            else localStorage.setItem('produtos', produtosAntigos);
+            if (vendasAntigas == null) localStorage.removeItem('historicoVendas');
+            else localStorage.setItem('historicoVendas', vendasAntigas);
+        } catch (rollbackError) {
+            console.error('Falha ao reverter gravação local:', rollbackError);
+        }
+        console.error('Não foi possível salvar os dados do PDV:', e);
+        return false;
+    }
 }
 
 // ===== RENDERIZAR PRODUTOS =====
@@ -62,11 +90,11 @@ function renderProdutos(filtro='', categoria='todos') {
     }
 
     grade.innerHTML = lista.map(p => `
-        <div class="cartao-produto" data-id="${p.id}">
-            <div class="emoji">${p.emoji}</div>
-            <div class="nome">${p.nome}</div>
+        <div class="cartao-produto" data-id="${Number(p.id)}">
+            <div class="emoji">${escapeHTML(p.emoji)}</div>
+            <div class="nome">${escapeHTML(p.nome)}</div>
             <div class="preco">R$ ${p.preco.toFixed(2)}</div>
-            <div class="unid">/${p.unidade}</div>
+            <div class="unid">/${escapeHTML(p.unidade)}</div>
         </div>
     `).join('');
 
@@ -138,18 +166,22 @@ function atualizarCarrinho() {
     lista.innerHTML = carrinho.map(item => `
         <div class="item-carrinho">
             <div>
-                <span>${item.emoji}</span>
+                <span>${escapeHTML(item.emoji)}</span>
                 <div>
-                    <div>${item.nome}</div>
-                    <div style="font-size:0.8rem;color:#666;">${item.quantidade.toFixed(3)} ${item.unidade} × R$ ${item.preco.toFixed(2)}</div>
+                    <div>${escapeHTML(item.nome)}</div>
+                    <div style="font-size:0.8rem;color:#666;">${item.quantidade.toFixed(3)} ${escapeHTML(item.unidade)} × R$ ${item.preco.toFixed(2)}</div>
                 </div>
             </div>
             <div style="text-align:right;">
                 <div style="font-weight:bold;">R$ ${(item.preco * item.quantidade).toFixed(2)}</div>
-                <button style="background:none;border:none;color:red;cursor-pointer;padding:2px;" onclick="removerItem(${item.id})">✕</button>
+                <button type="button" class="remover-item" data-id="${Number(item.id)}" aria-label="Remover ${escapeHTML(item.nome)}" style="background:none;border:none;color:red;cursor:pointer;padding:2px;">✕</button>
             </div>
         </div>
     `).join('');
+
+    lista.querySelectorAll('.remover-item').forEach(btn => {
+        btn.addEventListener('click', () => removerItem(Number(btn.dataset.id)));
+    });
 
     const subtotal = carrinho.reduce((s,i) => s + (i.preco * i.quantidade), 0);
     document.getElementById('subtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
@@ -173,42 +205,66 @@ document.querySelectorAll('.btn-pag').forEach(btn => {
 
 // ===== FINALIZAR VENDA =====
 document.getElementById('btn-finalizar').addEventListener('click', () => {
-    if(carrinho.length === 0) return alert('Carrinho vazio!');
-    if(!formaPagamento) return alert('Selecione a forma de pagamento!');
+    if (carrinho.length === 0) return alert('Carrinho vazio!');
+    if (!formaPagamento) return alert('Selecione a forma de pagamento!');
 
-    const subtotal = carrinho.reduce((s,i) => s + (i.preco * i.quantidade), 0);
-    
-    // Atualizar estoque
+    for (const item of carrinho) {
+        const p = produtos.find(x => Number(x.id) === Number(item.produtoId));
+        const quantidade = numeroValido(item.quantidade, Number.MIN_VALUE);
+        const preco = numeroValido(item.preco, 0);
+        const estoque = numeroValido(p?.estoque ?? 0, 0);
+        if (!p || quantidade === null || preco === null || estoque === null) {
+            return alert('Venda não finalizada: produto, preço, quantidade ou estoque inválido.');
+        }
+        if (estoque < quantidade) {
+            return alert(`Estoque insuficiente para ${p.nome}. Disponível: ${estoque}.`);
+        }
+    }
+
+    const subtotal = carrinho.reduce((s, i) => s + (Number(i.preco) * Number(i.quantidade)), 0);
+    if (!Number.isFinite(subtotal) || subtotal <= 0) return alert('Total da venda inválido.');
+
+    const produtosAntes = JSON.stringify(produtos);
+    const vendasAntes = JSON.stringify(historicoVendas);
     carrinho.forEach(item => {
         const p = produtos.find(x => Number(x.id) === Number(item.produtoId));
-        if(p) p.estoque = (p.estoque || 0) - item.quantidade;
+        p.estoque = Number(p.estoque || 0) - Number(item.quantidade);
     });
 
     const venda = {
         id: Date.now(),
         data: new Date().toISOString(),
-        itens: [...carrinho],
-        subtotal: subtotal,
+        itens: carrinho.map(item => ({ ...item })),
+        subtotal,
         desconto: 0,
         total: subtotal,
-        formaPagamento: formaPagamento,
+        formaPagamento,
         cupomTexto: gerarCupom(subtotal)
     };
-
     historicoVendas.push(venda);
-    salvarTudo();
 
-    // Imprimir
-    const janela = window.open('','','width=320,height=600');
-    janela.document.write(`<pre style="font-family:monospace;font-size:12px;white-space:pre-wrap;margin:0;">${venda.cupomTexto}</pre>`);
-    janela.document.close();
-    
+    if (!salvarTudo()) {
+        produtos = JSON.parse(produtosAntes);
+        historicoVendas = JSON.parse(vendasAntes);
+        return alert('Venda não registrada: falha ao salvar os dados. O carrinho foi mantido. Verifique o armazenamento e tente novamente.');
+    }
+
+    const janela = window.open('', '_blank', 'width=320,height=600');
+    if (janela) {
+        const pre = janela.document.createElement('pre');
+        pre.style.cssText = 'font-family:monospace;font-size:12px;white-space:pre-wrap;margin:0;';
+        pre.textContent = venda.cupomTexto;
+        janela.document.body.appendChild(pre);
+        janela.document.close();
+    } else {
+        alert('Venda salva. O navegador bloqueou a janela de impressão; permita pop-ups para imprimir o cupom.');
+    }
+
     carrinho = [];
     formaPagamento = null;
     atualizarCarrinho();
     renderProdutos();
 });
-
 // ===== GERAR CUPOM =====
 function gerarCupom(total) {
     const data = new Date().toLocaleString('pt-BR');
