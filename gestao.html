@@ -221,6 +221,16 @@
 
     <script>
         // ===== FUNÇÕES DE SEGURANÇA =====
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[char]));
+        }
+        function csvCell(value, protectFormula = false) {
+            let text = String(value ?? '');
+            if (protectFormula && /^[\\s]*[=+\\-@\\t\\r]/.test(text)) text = "'" + text;
+            return '"' + text.replace(/"/g, '""') + '"';
+        }
         function salvarDados(chave, valor) {
             try {
                 localStorage.setItem(chave, JSON.stringify(valor));
@@ -284,8 +294,12 @@
         function reimprimir(id) {
             const v = historicoVendas.find(x => Number(x.id) === Number(id));
             if (!v || !v.cupomTexto) return alert('Cupom não disponível!');
-            const janela = window.open('', '', 'width=320,height=600');
-            janela.document.write(`<pre style="font-family:monospace;font-size:12px;white-space:pre-wrap;margin:0;">${v.cupomTexto}</pre>`);
+            const janela = window.open('', '_blank', 'width=320,height=600');
+            if (!janela) return alert('Permita pop-ups para reimprimir o cupom.');
+            const pre = janela.document.createElement('pre');
+            pre.style.cssText = 'font-family:monospace;font-size:12px;white-space:pre-wrap;margin:0;';
+            pre.textContent = v.cupomTexto;
+            janela.document.body.appendChild(pre);
             janela.document.close();
         }
 
@@ -298,14 +312,14 @@
             );
             document.getElementById('tab-etiquetas').innerHTML = l.map(p => `
                 <tr>
-                    <td><input type="checkbox" class="chk-etq" data-id="${p.id}" ${selecionadosEtq[p.id] ? 'checked' : ''} onchange="selecionarEtq(${p.id}, this.checked)"></td>
-                    <td>${p.codigo}</td>
-                    <td>${p.emoji} ${p.nome}</td>
+                    <td><input type="checkbox" class="chk-etq" data-id="${Number(p.id)}" ${selecionadosEtq[p.id] ? 'checked' : ''} onchange="selecionarEtq(${Number(p.id)}, this.checked)"></td>
+                    <td>${escapeHTML(p.codigo)}</td>
+                    <td>${escapeHTML(p.emoji)} ${escapeHTML(p.nome)}</td>
                     <td>R$ ${p.preco.toFixed(2)}</td>
                     <td>
                         <input type="number" min="1" max="50" value="${selecionadosEtq[p.id] || 1}" 
                                style="width:60px;padding:4px;" 
-                               onchange="selecionarEtq(${p.id}, true, this.value)">
+                               onchange="selecionarEtq(${Number(p.id)}, true, this.value)">
                     </td>
                 </tr>
             `).join('');
@@ -357,8 +371,8 @@
                     const codBarra = p.codigo.padStart(13, '0');
                     htmlEtiquetas += `
                     <div class="etiqueta">
-                        <div class="etq-nome">${p.nome.substring(0,14)}</div>
-                        <div class="etq-cod">${p.codigo}</div>
+                        <div class="etq-nome">${escapeHTML(String(p.nome ?? '').substring(0,14))}</div>
+                        <div class="etq-cod">${escapeHTML(p.codigo)}</div>
                         <div class="etq-preco">R$ ${p.preco.toFixed(2)}</div>
                         <div class="etq-barra">${codBarra}</div>
                     </div>
@@ -367,9 +381,15 @@
             }
             const area = document.getElementById('area-impressao-etq');
             area.innerHTML = htmlEtiquetas;
-            const janela = window.open('', '', 'width=400,height=600');
-            janela.document.write(area.innerHTML);
+            const janela = window.open('', '_blank', 'width=400,height=600');
+            if (!janela) return alert('Permita pop-ups para imprimir etiquetas.');
+            const estilo = janela.document.createElement('style');
+            estilo.textContent = document.querySelector('style')?.textContent || '';
+            janela.document.head.appendChild(estilo);
+            const conteudo = area.cloneNode(true);
+            janela.document.body.appendChild(conteudo);
             janela.document.close();
+            janela.focus();
             janela.print();
         }
 
@@ -408,13 +428,13 @@
             document.getElementById('estoque-baixo').textContent = baixo;
             document.getElementById('vendas-mes').textContent = `R$ ${vMes.toFixed(2)}`;
             const ult = historicoVendas.slice(-5).reverse();
-            document.getElementById('lista-mov').innerHTML = ult.length ? ult.map(v => `<tr><td>${new Date(v.data).toLocaleString('pt-BR')}</td><td>${v.itens.length}</td><td>R$ ${v.total.toFixed(2)}</td><td>${v.formaPagamento}</td><td><button class="btn-tabela btn-primario" onclick="reimprimir(${v.id})">🖨️</button></td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:#999;">Sem dados</td></tr>';
+            document.getElementById('lista-mov').innerHTML = ult.length ? ult.map(v => `<tr><td>${new Date(v.data).toLocaleString('pt-BR')}</td><td>${v.itens.length}</td><td>R$ ${v.total.toFixed(2)}</td><td>${escapeHTML(v.formaPagamento)}</td><td><button class="btn-tabela btn-primario" onclick="reimprimir(${Number(v.id)})">🖨️</button></td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:#999;">Sem dados</td></tr>';
         }
 
         // ===== PRODUTOS =====
         function carregarProd(f = '') {
             const l = produtos.filter(p => p.nome.toLowerCase().includes(f.toLowerCase()) || p.codigo.includes(f));
-            document.getElementById('tab-prod').innerHTML = l.map(p => `<tr><td>${p.codigo}</td><td>${p.emoji} ${p.nome}</td><td>${p.categoria}</td><td>R$ ${p.preco.toFixed(2)}</td><td>${p.estoque || 0}</td><td><button class="btn-tabela btn-primario" onclick="editarProd(${p.id})">✏️</button><button class="btn-tabela btn-perigo" onclick="excluirProd(${p.id})">🗑️</button></td></tr>`).join('');
+            document.getElementById('tab-prod').innerHTML = l.map(p => `<tr><td>${escapeHTML(p.codigo)}</td><td>${escapeHTML(p.emoji)} ${escapeHTML(p.nome)}</td><td>${escapeHTML(p.categoria)}</td><td>R$ ${p.preco.toFixed(2)}</td><td>${p.estoque || 0}</td><td><button class="btn-tabela btn-primario" onclick="editarProd(${Number(p.id)})">✏️</button><button class="btn-tabela btn-perigo" onclick="excluirProd(${Number(p.id)})">🗑️</button></td></tr>`).join('');
         }
         document.getElementById('busca-prod').oninput = e => carregarProd(e.target.value);
 
@@ -442,7 +462,7 @@
         };
 
         // ===== ESTOQUE =====
-        function preencherSelectMov() { const s = document.getElementById('mov-prod'); s.innerHTML = '<option value="">Selecione...</option>' + produtos.map(p => `<option value="${p.id}">${p.codigo} — ${p.nome}</option>`).join(''); }
+        function preencherSelectMov() { const s = document.getElementById('mov-prod'); s.innerHTML = '<option value="">Selecione...</option>' + produtos.map(p => `<option value="${Number(p.id)}">${escapeHTML(p.codigo)} — ${escapeHTML(p.nome)}</option>`).join(''); }
         function abrirModalMov(t) { document.getElementById('tit-mov').textContent = t === 'entrada' ? '📥 Entrada' : '📤 Saída'; document.getElementById('mov-tipo').value = t; document.getElementById('form-mov').reset(); preencherSelectMov(); document.getElementById('modal-mov').classList.add('aberto'); }
         function fecharModalMov() { document.getElementById('modal-mov').classList.remove('aberto'); }
         document.getElementById('form-mov').onsubmit = e => {
@@ -461,20 +481,33 @@
             salvarTudo(); fecharModalMov(); carregarEstoque();
         };
         function carregarEstoque() {
-            document.getElementById('tab-mov-est').innerHTML = movEstoque.length ? movEstoque.map(m => `<tr><td>${new Date(m.data).toLocaleString('pt-BR')}</td><td>${m.tipo === 'entrada' ? '📥 Entrada' : '📤 Saída'}</td><td>${m.produtoNome}</td><td>${m.quantidade}</td><td>${m.saldoApos}</td><td>${m.responsavel}</td><td>${m.observacao || '—'}</td></tr>`).join('') : '<tr><td colspan="7" style="text-align:center;color:#999;">Sem movimentações</td></tr>';
+            document.getElementById('tab-mov-est').innerHTML = movEstoque.length ? movEstoque.map(m => `<tr><td>${new Date(m.data).toLocaleString('pt-BR')}</td><td>${m.tipo === 'entrada' ? '📥 Entrada' : '📤 Saída'}</td><td>${escapeHTML(m.produtoNome)}</td><td>${m.quantidade}</td><td>${m.saldoApos}</td><td>${escapeHTML(m.responsavel)}</td><td>${escapeHTML(m.observacao || '—')}</td></tr>`).join('') : '<tr><td colspan="7" style="text-align:center;color:#999;">Sem movimentações</td></tr>';
             document.getElementById('tab-saldo').innerHTML = produtos.map(p => {
                 const e = p.estoque || 0, m = p.minimo || 5;
                 let cls = 'tag-ok', sts = 'OK'; if (e < m) { cls = 'tag-baixo'; sts = 'BAIXO'; } else if (e < m * 1.5) { cls = 'tag-medio'; sts = 'ATENÇÃO'; }
-                return `<tr><td>${p.emoji} ${p.nome}</td><td>${e}</td><td>${m}</td><td><span class="tag-estoque ${cls}">${sts}</span></td></tr>`;
+                return `<tr><td>${escapeHTML(p.emoji)} ${escapeHTML(p.nome)}</td><td>${e}</td><td>${m}</td><td><span class="tag-estoque ${cls}">${sts}</span></td></tr>`;
             }).join('');
         }
         function exportarMov() {
-            let txt = 'Data;Tipo;Produto;Quantidade;Saldo;Responsável;Observação\n';
-            movEstoque.forEach(m => txt += `${new Date(m.data).toLocaleString('pt-BR')};${m.tipo};${m.produtoNome};${m.quantidade};${m.saldoApos};${m.responsavel};${m.observacao}\n`);
-            const b = new Blob([txt], { type: 'text/csv;charset=utf-8' });
+            const linhas = [[
+                'Data','Tipo','Produto','Quantidade','Saldo','Responsável','Observação'
+            ].map(v => csvCell(v)).join(';')];
+            movEstoque.forEach(m => {
+                linhas.push([
+                    csvCell(new Date(m.data).toLocaleString('pt-BR')),
+                    csvCell(m.tipo, true),
+                    csvCell(m.produtoNome, true),
+                    csvCell(m.quantidade),
+                    csvCell(m.saldoApos),
+                    csvCell(m.responsavel, true),
+                    csvCell(m.observacao, true)
+                ].join(';'));
+            });
+            const b = new Blob(['\\uFEFF' + linhas.join('\\r\\n')], { type: 'text/csv;charset=utf-8' });
             const u = URL.createObjectURL(b);
             const a = document.createElement('a');
             a.href = u; a.download = 'estoque.csv'; a.click();
+            setTimeout(() => URL.revokeObjectURL(u), 1000);
         }
 
         // ===== CALENDÁRIO =====
@@ -526,7 +559,7 @@
             document.getElementById('fd-cart').textContent = `R$ ${totais.cartao.toFixed(2)}`;
             document.getElementById('fd-cred').textContent = `R$ ${totais.crediario.toFixed(2)}`;
             document.getElementById('fd-total').textContent = `R$ ${totalDia.toFixed(2)}`;
-            document.getElementById('fd-vendas').innerHTML = vendasDia.length ? vendasDia.map(v => `<tr><td>${new Date(v.data).toLocaleTimeString('pt-BR')}</td><td>${v.itens.length}</td><td>R$ ${v.subtotal.toFixed(2)}</td><td>R$ ${v.desconto.toFixed(2)}</td><td>R$ ${v.total.toFixed(2)}</td><td>${v.formaPagamento}</td><td><button class="btn-tabela btn-primario" onclick="reimprimir(${v.id})">🖨️</button></td></tr>`).join('') : '<tr><td colspan="7" style="text-align:center;color:#999;">Sem vendas neste dia</td></tr>';
+            document.getElementById('fd-vendas').innerHTML = vendasDia.length ? vendasDia.map(v => `<tr><td>${new Date(v.data).toLocaleTimeString('pt-BR')}</td><td>${v.itens.length}</td><td>R$ ${v.subtotal.toFixed(2)}</td><td>R$ ${v.desconto.toFixed(2)}</td><td>R$ ${v.total.toFixed(2)}</td><td>${escapeHTML(v.formaPagamento)}</td><td><button class="btn-tabela btn-primario" onclick="reimprimir(${Number(v.id)})">🖨️</button></td></tr>`).join('') : '<tr><td colspan="7" style="text-align:center;color:#999;">Sem vendas neste dia</td></tr>';
             document.getElementById('fech-det').classList.add('visivel');
         }
 
@@ -537,7 +570,7 @@
                 const f = new Date(filtroData + 'T00:00:00');
                 lista = historicoVendas.filter(v => mesmaData(new Date(v.data), f));
             }
-            document.getElementById('tab-vendas').innerHTML = lista.length ? lista.map((v, idx) => `<tr><td>${idx + 1}</td><td>${new Date(v.data).toLocaleString('pt-BR')}</td><td>${v.itens.length}</td><td>R$ ${v.subtotal.toFixed(2)}</td><td>R$ ${v.desconto.toFixed(2)}</td><td>R$ ${v.total.toFixed(2)}</td><td>${v.formaPagamento}</td><td><button class="btn-tabela btn-primario" onclick="reimprimir(${v.id})">🖨️</button></td></tr>`).join('') : '<tr><td colspan="8" style="text-align:center;color:#999;">Sem vendas</td></tr>';
+            document.getElementById('tab-vendas').innerHTML = lista.length ? lista.map((v, idx) => `<tr><td>${idx + 1}</td><td>${new Date(v.data).toLocaleString('pt-BR')}</td><td>${v.itens.length}</td><td>R$ ${v.subtotal.toFixed(2)}</td><td>R$ ${v.desconto.toFixed(2)}</td><td>R$ ${v.total.toFixed(2)}</td><td>${escapeHTML(v.formaPagamento)}</td><td><button class="btn-tabela btn-primario" onclick="reimprimir(${Number(v.id)})">🖨️</button></td></tr>`).join('') : '<tr><td colspan="8" style="text-align:center;color:#999;">Sem vendas</td></tr>';
         }
         function filtrarVendas() {
             const d = document.getElementById('filtro-data').value;
