@@ -169,7 +169,7 @@ function atualizarCarrinho() {
                 <span>${escapeHTML(item.emoji)}</span>
                 <div>
                     <div>${escapeHTML(item.nome)}</div>
-                    <div style="font-size:0.8rem;color:#666;">${item.quantidade.toFixed(3)} ${item.unidade} × R$ ${item.preco.toFixed(2)}</div>
+                    <div style="font-size:0.8rem;color:#666;">${item.quantidade.toFixed(3)} ${escapeHTML(item.unidade)} × R$ ${item.preco.toFixed(2)}</div>
                 </div>
             </div>
             <div style="text-align:right;">
@@ -178,10 +178,6 @@ function atualizarCarrinho() {
             </div>
         </div>
     `).join('');
-
-    lista.querySelectorAll('.remover-item').forEach(btn => {
-        btn.addEventListener('click', () => removerItem(Number(btn.dataset.id)));
-    });
 
     lista.querySelectorAll('.remover-item').forEach(btn => {
         btn.addEventListener('click', () => removerItem(Number(btn.dataset.id)));
