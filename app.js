@@ -42,8 +42,25 @@ let produtoParaPesar = null;
 
 // ===== SALVAR =====
 function salvarTudo() {
-    salvarDados('produtos', produtos);
-    salvarDados('historicoVendas', historicoVendas);
+    let produtosAntigos, vendasAntigas;
+    try {
+        produtosAntigos = localStorage.getItem('produtos');
+        vendasAntigas = localStorage.getItem('historicoVendas');
+        localStorage.setItem('produtos', JSON.stringify(produtos));
+        localStorage.setItem('historicoVendas', JSON.stringify(historicoVendas));
+        return true;
+    } catch (e) {
+        try {
+            if (produtosAntigos == null) localStorage.removeItem('produtos');
+            else localStorage.setItem('produtos', produtosAntigos);
+            if (vendasAntigas == null) localStorage.removeItem('historicoVendas');
+            else localStorage.setItem('historicoVendas', vendasAntigas);
+        } catch (rollbackError) {
+            console.error('Falha ao reverter gravação local:', rollbackError);
+        }
+        console.error('Não foi possível salvar os dados do PDV:', e);
+        return false;
+    }
 }
 
 // ===== RENDERIZAR PRODUTOS =====
@@ -150,6 +167,10 @@ function atualizarCarrinho() {
             </div>
         </div>
     `).join('');
+
+    lista.querySelectorAll('.remover-item').forEach(btn => {
+        btn.addEventListener('click', () => removerItem(Number(btn.dataset.id)));
+    });
 
     const subtotal = carrinho.reduce((s,i) => s + (i.preco * i.quantidade), 0);
     document.getElementById('subtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
