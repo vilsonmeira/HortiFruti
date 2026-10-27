@@ -268,10 +268,28 @@
         let dataCal = new Date(), dataSel = null;
 
         function salvarTudo() {
-            salvarDados('produtos', produtos);
-            salvarDados('historicoVendas', historicoVendas);
-            salvarDados('movimentacoesEstoque', movEstoque);
-            salvarDados('configuracoes', cfg);
+            const chaves = ['produtos', 'historicoVendas', 'movimentacoesEstoque', 'configuracoes'];
+            const anteriores = {};
+            try {
+                chaves.forEach(k => anteriores[k] = localStorage.getItem(k));
+                localStorage.setItem('produtos', JSON.stringify(produtos));
+                localStorage.setItem('historicoVendas', JSON.stringify(historicoVendas));
+                localStorage.setItem('movimentacoesEstoque', JSON.stringify(movEstoque));
+                localStorage.setItem('configuracoes', JSON.stringify(cfg));
+                return true;
+            } catch (e) {
+                try {
+                    chaves.forEach(k => {
+                        if (anteriores[k] == null) localStorage.removeItem(k);
+                        else localStorage.setItem(k, anteriores[k]);
+                    });
+                } catch (rollbackError) {
+                    console.error('Falha ao reverter armazenamento:', rollbackError);
+                }
+                alert('Não foi possível salvar. As alterações não foram confirmadas; verifique o armazenamento do navegador.');
+                console.error('Erro ao salvar dados:', e);
+                return false;
+            }
         }
 
         // ===== CONFIGURAÇÕES =====
@@ -441,7 +459,7 @@
         function abrirModalProd() { document.getElementById('tit-prod').textContent = 'Novo Produto'; document.getElementById('prod-id').value = ''; document.getElementById('form-prod').reset(); document.getElementById('modal-prod').classList.add('aberto'); }
         function fecharModalProd() { document.getElementById('modal-prod').classList.remove('aberto'); }
         function editarProd(id) { const p = produtos.find(x => Number(x.id) === Number(id)); if (!p) return; document.getElementById('tit-prod').textContent = 'Editar Produto'; document.getElementById('prod-id').value = p.id; document.getElementById('prod-cod').value = p.codigo; document.getElementById('prod-nome').value = p.nome; document.getElementById('prod-emoji').value = p.emoji; document.getElementById('prod-cat').value = p.categoria; document.getElementById('prod-preco').value = p.preco; document.getElementById('prod-und').value = p.unidade; document.getElementById('prod-est').value = p.estoque; document.getElementById('prod-min').value = p.minimo; document.getElementById('modal-prod').classList.add('aberto'); }
-        function excluirProd(id) { if (confirm('Excluir produto?')) { produtos = produtos.filter(p => Number(p.id) !== Number(id)); salvarTudo(); carregarProd(); }}
+        function excluirProd(id) { if (confirm('Excluir produto?')) { produtos = produtos.filter(p => Number(p.id) !== Number(id)); if (!salvarTudo()) { produtos = carregarDados('produtos', produtosPadrao); return; } carregarProd(); }}
         document.getElementById('form-prod').onsubmit = e => {
             e.preventDefault();
             const id = document.getElementById('prod-id').value;
@@ -455,10 +473,14 @@
                 estoque: parseFloat(document.getElementById('prod-est').value || 0),
                 minimo: parseFloat(document.getElementById('prod-min').value || 5)
             };
-            if (dados.preco <= 0) return alert('Preço deve ser maior que zero!');
+            if (!dados.codigo.trim() || !dados.nome.trim()) return alert('Código e nome do produto são obrigatórios!');
+            if (!Number.isFinite(dados.preco) || dados.preco <= 0) return alert('Preço deve ser maior que zero!');
+            if (!Number.isFinite(dados.estoque) || dados.estoque < 0 || !Number.isFinite(dados.minimo) || dados.minimo < 0) return alert('Estoque e estoque mínimo devem ser números válidos, iguais ou maiores que zero.');
+            dados.codigo = dados.codigo.trim();
+            dados.nome = dados.nome.trim();
             if (id) { const p = produtos.find(x => Number(x.id) === Number(id)); Object.assign(p, dados); }
             else { produtos.push({ id: Date.now(), ...dados }); }
-            salvarTudo(); fecharModalProd(); carregarProd();
+            if (!salvarTudo()) { produtos = carregarDados('produtos', produtosPadrao); return; } fecharModalProd(); carregarProd();
         };
 
         // ===== ESTOQUE =====
@@ -472,13 +494,13 @@
             const qtd = parseFloat(document.getElementById('mov-qtd').value);
             const resp = document.getElementById('mov-resp').value;
             const obs = document.getElementById('mov-obs').value;
-            if (qtd <= 0) return alert('Quantidade deve ser maior que zero!');
+            if (!Number.isFinite(qtd) || qtd <= 0) return alert('Quantidade deve ser um número válido maior que zero!');
             const p = produtos.find(x => Number(x.id) === prodId); if (!p) return;
             const ant = p.estoque || 0;
             if (tipo === 'entrada') p.estoque = ant + qtd;
             else { if (qtd > ant) return alert(`Estoque insuficiente! Disponível: ${ant}`); p.estoque = ant - qtd; }
             movEstoque.unshift({ id: Date.now(), data: new Date().toISOString(), tipo, produtoId: prodId, produtoNome: p.nome, quantidade: qtd, saldoApos: p.estoque, responsavel: resp, observacao: obs });
-            salvarTudo(); fecharModalMov(); carregarEstoque();
+            if (!salvarTudo()) { produtos = carregarDados('produtos', produtosPadrao); movEstoque = carregarDados('movimentacoesEstoque', []); return; } fecharModalMov(); carregarEstoque();
         };
         function carregarEstoque() {
             document.getElementById('tab-mov-est').innerHTML = movEstoque.length ? movEstoque.map(m => `<tr><td>${new Date(m.data).toLocaleString('pt-BR')}</td><td>${m.tipo === 'entrada' ? '📥 Entrada' : '📤 Saída'}</td><td>${escapeHTML(m.produtoNome)}</td><td>${m.quantidade}</td><td>${m.saldoApos}</td><td>${escapeHTML(m.responsavel)}</td><td>${escapeHTML(m.observacao || '—')}</td></tr>`).join('') : '<tr><td colspan="7" style="text-align:center;color:#999;">Sem movimentações</td></tr>';
