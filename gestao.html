@@ -360,7 +360,7 @@
                 const info=d.createElement('div');info.className='detalhe';info.textContent=modo==='simples'?'POR '+String(p.unidade||'un').toUpperCase():(modo==='completo'?'POR '+String(p.unidade||'un').toUpperCase()+' | ':'')+'CÓD: '+String(p.codigo||'');el.appendChild(info);
                 const loja=d.createElement('div');loja.className='loja';loja.textContent=String(cfg.nome||'HORTIFRUTI');el.appendChild(loja);d.body.appendChild(el);
             });
-            d.close();w.addEventListener('load',()=>{w.focus();w.print();});setTimeout(()=>{if(!w.closed){w.focus();w.print();}},800);
+            d.close();setTimeout(()=>{if(!w.closed){w.focus();w.print();}},600);
         }
         async function exportarEtiquetasFlashToy(){
             const l=listaEtiquetas();if(!l.length)return alert('Selecione pelo menos um produto.');
