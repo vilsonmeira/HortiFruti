@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2e7d32">
+  <title>Hortifruti | Lista de compras</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body{background:#f4f7f1;color:#263326}.cliente-wrap{max-width:1100px;margin:24px auto;padding:0 16px}
+    .cliente-painel{background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 10px #0001}
+    .cliente-topo{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+    .cliente-busca{display:flex;gap:8px;margin:18px 0}.cliente-busca input{flex:1;min-width:0;padding:12px;border:1px solid #ccd8ca;border-radius:8px}
+    .cliente-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+    .produto-cliente{border:1px solid #e1e9df;border-radius:10px;padding:14px;background:#fff;display:flex;flex-direction:column;gap:7px}
+    .produto-cliente .emoji{font-size:30px}.produto-cliente button,.pedido button{border:0;border-radius:7px;padding:10px;background:#2e7d32;color:#fff;font-weight:700;cursor:pointer}
+    .preco-cliente{font-weight:700;color:#2e7d32}.cliente-colunas{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr);gap:18px;margin-top:16px}
+    .pedido-linha{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #eee}
+    .pedido-linha input{width:74px;padding:6px;border:1px solid #ccd8ca;border-radius:6px}
+    .cliente-form{display:grid;gap:9px;margin-top:14px}.cliente-form input,.cliente-form textarea{width:100%;padding:10px;border:1px solid #ccd8ca;border-radius:7px}
+    .cliente-status{padding:10px;border-radius:8px;background:#eef5ec;margin:12px 0}.cliente-erro{background:#fff0ee;color:#9b2c20}
+    @media(max-width:760px){.cliente-colunas{grid-template-columns:1fr}.cliente-wrap{padding:0 8px}.cliente-painel{padding:14px}}
+  </style>
+</head>
+<body>
+<header class="cabecalho">
+  <div class="logo"><span class="fruta">🍉</span><h1>Hortifruti <span>Compras</span></h1><span class="fruta">🍎</span></div>
+  <div class="navegacao"><a href="index.html">🛒 PDV</a></div>
+</header>
+<main class="cliente-wrap">
+  <section class="cliente-painel">
+    <div class="cliente-topo"><div><h2>🛍️ Lista de compras</h2><p>Consulte os produtos e envie seu pedido para a loja.</p></div><strong id="estado-conexao">Conectando...</strong></div>
+    <div id="mensagem" class="cliente-status" role="status">Carregando catálogo...</div>
+    <div class="cliente-busca"><input id="busca-produtos" type="search" placeholder="Buscar produto..."><select id="filtro-categoria" aria-label="Categoria"><option value="">Todas as categorias</option></select></div>
+    <div class="cliente-colunas">
+      <section><div id="catalogo" class="cliente-grid"></div></section>
+      <aside class="pedido">
+        <h3>🧺 Meu pedido (<span id="qtd-itens">0</span>)</h3>
+        <div id="itens-pedido"><p>Nenhum produto adicionado.</p></div>
+        <h3>Total estimado: <span id="total-pedido">R$ 0,00</span></h3>
+        <form id="form-pedido" class="cliente-form">
+          <input id="cliente-nome" maxlength="120" placeholder="Seu nome (opcional)">
+          <input id="cliente-telefone" maxlength="30" placeholder="Telefone (opcional)">
+          <textarea id="cliente-observacao" maxlength="500" rows="3" placeholder="Observação (opcional)"></textarea>
+          <button type="submit" id="enviar-pedido">Enviar pedido</button>
+        </form>
+        <small>O envio do pedido não exige cadastro. A loja confirmará a disponibilidade e o atendimento.</small>
+      </aside>
+    </div>
+  </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="cliente.js"></script>
+</body>
+</html>
