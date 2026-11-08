@@ -155,7 +155,7 @@
                         <div>
                             <button class="btn-acao btn-primario" onclick="selecionarTodos()">✅ Todos</button>
                             <button class="btn-acao btn-secundario" onclick="limparSelecao()">❌ Nenhum</button>
-                            <button class="btn-acao btn-primario" onclick="gerarEtiquetas()">🖨️ Gerar Etiquetas</button>
+                            <button class="btn-acao btn-primario" onclick="gerarEtiquetas()">🖨️ Imprimir</button>\n                            <button class="btn-acao btn-aviso" onclick="exportarEtiquetasFlashToy()">📲 Enviar ao FlashToy</button>
                         </div>
                     </div>
                     <div class="busca" style="margin-bottom:15px;">
@@ -321,96 +321,22 @@
             janela.document.close();
         }
 
-        // ===== ETIQUETAS DE PREÇO =====
+        // ===== ETIQUETAS 50 MM / FLASHTOY =====
         let selecionadosEtq = {};
         function carregarEtiquetas(f='') {
-            const l = produtos.filter(p => 
-                p.nome.toLowerCase().includes(f.toLowerCase()) ||
-                p.codigo.includes(f)
-            );
-            document.getElementById('tab-etiquetas').innerHTML = l.map(p => `
-                <tr>
-                    <td><input type="checkbox" class="chk-etq" data-id="${Number(p.id)}" ${selecionadosEtq[p.id] ? 'checked' : ''} onchange="selecionarEtq(${Number(p.id)}, this.checked)"></td>
-                    <td>${escapeHTML(p.codigo)}</td>
-                    <td>${escapeHTML(p.emoji)} ${escapeHTML(p.nome)}</td>
-                    <td>R$ ${p.preco.toFixed(2)}</td>
-                    <td>
-                        <input type="number" min="1" max="50" value="${selecionadosEtq[p.id] || 1}" 
-                               style="width:60px;padding:4px;" 
-                               onchange="selecionarEtq(${Number(p.id)}, true, this.value)">
-                    </td>
-                </tr>
-            `).join('');
+            const termo=String(f).toLocaleLowerCase('pt-BR');
+            const lista=produtos.filter(p=>String(p.nome).toLocaleLowerCase('pt-BR').includes(termo)||String(p.codigo).includes(termo));
+            document.getElementById('tab-etiquetas').innerHTML=lista.map(p=>`<tr><td><input type="checkbox" class="chk-etq" data-id="${Number(p.id)}" ${selecionadosEtq[p.id]?'checked':''} onchange="selecionarEtq(${Number(p.id)},this.checked)"></td><td>${escapeHTML(p.codigo)}</td><td>${escapeHTML(p.emoji)} ${escapeHTML(p.nome)}</td><td>R$ ${Number(p.preco).toFixed(2)}</td><td><input type="number" min="1" max="100" value="${selecionadosEtq[p.id]||1}" style="width:65px" onchange="selecionarEtq(${Number(p.id)},true,this.value)"></td></tr>`).join('');
         }
-        function selecionarEtq(id, checked, qtd=1) {
-            if(checked) selecionadosEtq[id] = parseInt(qtd) || 1;
-            else delete selecionadosEtq[id];
-        }
-        function toggleTodos() {
-            const todos = document.getElementById('check-todos').checked;
-            document.querySelectorAll('.chk-etq').forEach(chk => {
-                chk.checked = todos;
-                selecionarEtq(parseInt(chk.dataset.id), todos, 1);
-            });
-            carregarEtiquetas(document.getElementById('busca-etq').value);
-        }
-        function selecionarTodos() {
-            produtos.forEach(p => selecionadosEtq[p.id] = 1);
-            carregarEtiquetas(document.getElementById('busca-etq').value);
-        }
-        function limparSelecao() {
-            selecionadosEtq = {};
-            carregarEtiquetas(document.getElementById('busca-etq').value);
-        }
-        function gerarEtiquetas() {
-            if(Object.keys(selecionadosEtq).length === 0) {
-                alert('Selecione pelo menos um produto!');
-                return;
-            }
-            let htmlEtiquetas = `
-            <style>
-                * { margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
-                .etiqueta { 
-                    width:70px; height:45px; border:1px solid #333; 
-                    padding:4px; margin:3px; display:inline-block; 
-                    text-align:center; font-size:10px; page-break-inside:avoid;
-                }
-                .etq-nome { font-weight:bold; font-size:9px; line-height:1.1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-                .etq-cod { font-size:7px; color:#666; margin:2px 0; }
-                .etq-preco { font-size:14px; font-weight:bold; color:#2e7d32; }
-                .etq-barra { font-family:'Courier New', monospace; font-size:7px; letter-spacing:2px; margin-top:2px; }
-                @media print { .etiqueta { border:1px dashed #999; } }
-            </style>
-            `;
-            for(const [id, qtd] of Object.entries(selecionadosEtq)) {
-                const p = produtos.find(x => Number(x.id) === Number(id));
-                if(!p) continue;
-                for(let i=0; i<qtd; i++) {
-                    const codBarra = p.codigo.padStart(13, '0');
-                    htmlEtiquetas += `
-                    <div class="etiqueta">
-                        <div class="etq-nome">${escapeHTML(String(p.nome ?? '').substring(0,14))}</div>
-                        <div class="etq-cod">${escapeHTML(p.codigo)}</div>
-                        <div class="etq-preco">R$ ${p.preco.toFixed(2)}</div>
-                        <div class="etq-barra">${escapeHTML(codBarra)}</div>
-                    </div>
-                    `;
-                }
-            }
-            const area = document.getElementById('area-impressao-etq');
-            area.innerHTML = htmlEtiquetas;
-            const janela = window.open('', '_blank', 'width=400,height=600');
-            if (!janela) return alert('Permita pop-ups para imprimir etiquetas.');
-            document.querySelectorAll('link[rel="stylesheet"], style').forEach(no => {
-                janela.document.head.appendChild(no.cloneNode(true));
-            });
-            const conteudo = area.cloneNode(true);
-            janela.document.body.appendChild(conteudo);
-            janela.document.close();
-            janela.focus();
-            janela.print();
-        }
-
+        function selecionarEtq(id,marcado,qtd=1){if(marcado)selecionadosEtq[id]=Math.max(1,Math.min(100,parseInt(qtd,10)||1));else delete selecionadosEtq[id];}
+        function toggleTodos(){const v=document.getElementById('check-todos').checked;document.querySelectorAll('.chk-etq').forEach(c=>selecionarEtq(Number(c.dataset.id),v,1));carregarEtiquetas(document.getElementById('busca-etq').value);}
+        function selecionarTodos(){produtos.forEach(p=>selecionadosEtq[p.id]=1);carregarEtiquetas(document.getElementById('busca-etq').value);}
+        function limparSelecao(){selecionadosEtq={};document.getElementById('check-todos').checked=false;carregarEtiquetas(document.getElementById('busca-etq').value);}
+        function listaEtiquetas(){const l=[];for(const [id,q] of Object.entries(selecionadosEtq)){const p=produtos.find(x=>Number(x.id)===Number(id));if(p)for(let i=0;i<q;i++)l.push(p);}return l;}
+        function canvasEtiqueta(p){const c=document.createElement('canvas');c.width=600;c.height=360;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,600,360);x.strokeStyle='#222';x.lineWidth=5;x.strokeRect(4,4,592,352);x.textAlign='center';x.fillStyle='#111';let n=String(p.nome||'Produto');x.font='bold 40px Arial';while(x.measureText(n).width>550&&n.length>4)n=n.slice(0,-1);x.fillText(n,300,75);x.font='bold 86px Arial';x.fillStyle='#176b2c';x.fillText('R$ '+Number(p.preco).toFixed(2).replace('.',','),300,190);x.font='26px Arial';x.fillStyle='#333';x.fillText('POR '+String(p.unidade||'un').toUpperCase(),300,235);x.font='24px Arial';x.fillText('CÓD: '+String(p.codigo||''),300,290);x.font='18px Arial';x.fillText(String(cfg.nome||'HORTIFRUTI').toUpperCase().slice(0,38),300,330);return c;}
+        async function exportarEtiquetasFlashToy(){const l=listaEtiquetas();if(!l.length)return alert('Selecione pelo menos um produto.');const fs=[];for(let i=0;i<l.length;i++){const blob=await new Promise(ok=>canvasEtiqueta(l[i]).toBlob(ok,'image/png'));if(blob)fs.push(new File([blob],'etiqueta-'+String(l[i].codigo||i)+'.png',{type:'image/png'}));}if(!fs.length)return alert('Falha ao gerar imagens.');if(navigator.share&&navigator.canShare&&navigator.canShare({files:fs})){try{await navigator.share({files:fs,title:'Etiquetas Hortifruti',text:'Etiquetas de 50 mm para FlashToy'});return;}catch(e){if(e.name==='AbortError')return;}}for(const f of fs){const u=URL.createObjectURL(f),a=document.createElement('a');a.href=u;a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000);}alert('PNG gerados. Abra o FlashToy e importe as imagens para imprimir.');}
+        function gerarEtiquetas(){const l=listaEtiquetas();if(!l.length)return alert('Selecione pelo menos um produto.');const w=window.open('','_blank');if(!w)return alert('Permita pop-ups para imprimir.');const st=w.document.createElement('style');st.textContent='@page{size:50mm 30mm;margin:0}html,body{margin:0;padding:0}img{width:50mm;height:30mm;display:block;page-break-after:always}';w.document.head.appendChild(st);l.forEach(p=>{const im=w.document.createElement('img');im.src=canvasEtiqueta(p).toDataURL('image/png');w.document.body.appendChild(im);});w.document.close();w.onload=()=>{w.focus();w.print();};}
+        document.getElementById('busca-etq').addEventListener('input',e=>carregarEtiquetas(e.target.value));
         // ===== ATALHOS =====
         document.addEventListener('keydown', e => { if (e.key === 'F9') { e.preventDefault(); window.location.href = 'index.html'; }});
 
