@@ -349,10 +349,10 @@
             const w=window.open('','_blank');if(!w)return alert('Permita pop-ups para imprimir as etiquetas.');
             const d=w.document;d.open();
             d.write('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Etiquetas HortiFruti</title><style>');
-            d.write('@page{size:50mm '+altura+'mm;margin:0}html,body{margin:0;padding:0;width:50mm;background:#fff;font-family:Arial,sans-serif}');
-            d.write('.etiqueta{width:50mm;height:'+altura+'mm;box-sizing:border-box;padding:2mm 2.5mm;display:flex;flex-direction:column;align-items:center;justify-content:space-around;overflow:hidden;page-break-after:always;break-after:page;text-align:center;color:#111}');
-            d.write('.nome{font-size:13pt;font-weight:700;line-height:1.08;max-width:100%;overflow-wrap:anywhere}.preco{font-size:25pt;line-height:1;font-weight:800;color:#176b2c;white-space:nowrap}.detalhe{font-size:9pt;line-height:1.1}.loja{font-size:7pt;max-width:100%;overflow:hidden}');
-            d.write('@media screen{body{margin:10mm auto;box-shadow:0 0 4px #888}.etiqueta{border:1px dashed #bbb}}</style></head><body>');
+            d.write('@page{size:50mm '+altura+'mm;margin:0!important}*{box-sizing:border-box}html,body{margin:0!important;padding:0!important;width:50mm;height:auto;background:#fff;font-family:Arial,sans-serif}');
+            d.write('.etiqueta{width:48mm;height:'+altura+'mm;margin:0 auto!important;padding:0.5mm 0.7mm!important;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;overflow:hidden;page-break-after:always;break-after:page;text-align:center;color:#111;border:0!important}');
+            d.write('.nome{font-size:12pt;font-weight:700;line-height:1.05;max-width:100%;overflow-wrap:anywhere}.preco{font-size:24pt;line-height:1;font-weight:800;color:#176b2c;white-space:nowrap}.detalhe{font-size:8pt;line-height:1.05}.loja{font-size:6.5pt;max-width:100%;overflow:hidden}');
+            d.write('@media screen{body{margin:10mm auto!important;box-shadow:0 0 4px #888}.etiqueta{outline:1px dashed #bbb}}</style></head><body>');
             lista.forEach(p=>{
                 const el=d.createElement('section');el.className='etiqueta';
                 const n=d.createElement('div');n.className='nome';n.textContent=String(p.nome||'Produto');el.appendChild(n);
