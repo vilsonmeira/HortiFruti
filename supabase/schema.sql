@@ -114,10 +114,11 @@ declare
   v_total numeric(12, 2) := 0;
   v_count integer := 0;
 begin
-  if p_items is null
-     or jsonb_typeof(p_items) is distinct from 'array'
-     or jsonb_array_length(p_items) < 1
-     or jsonb_array_length(p_items) > 100 then
+  if p_items is null or jsonb_typeof(p_items) is distinct from 'array' then
+    raise exception 'A lista de itens do pedido é inválida.';
+  end if;
+
+  if jsonb_array_length(p_items) < 1 or jsonb_array_length(p_items) > 100 then
     raise exception 'O pedido deve conter entre 1 e 100 itens.';
   end if;
 
