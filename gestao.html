@@ -155,11 +155,20 @@
                         <div>
                             <button class="btn-acao btn-primario" onclick="selecionarTodos()">✅ Todos</button>
                             <button class="btn-acao btn-secundario" onclick="limparSelecao()">❌ Nenhum</button>
-                            <button class="btn-acao btn-primario" onclick="gerarEtiquetas()">🖨️ Imprimir</button>\n                            <button class="btn-acao btn-aviso" onclick="exportarEtiquetasFlashToy()">📲 Enviar ao FlashToy</button>
+                            <button class="btn-acao btn-primario" onclick="gerarEtiquetas()">🖨️ Imprimir na 108Label</button>
+                            <button class="btn-acao btn-secundario" onclick="exportarEtiquetasFlashToy()">📲 Exportar PNG</button>
                         </div>
                     </div>
                     <div class="busca" style="margin-bottom:15px;">
                         <input type="text" id="busca-etq" placeholder="🔍 Buscar produto...">
+                    </div>
+                    <div class="grade-form" style="margin:12px 0;">
+                        <div class="grupo-form"><label for="etq-largura">Largura do papel</label><input id="etq-largura" type="text" value="50 mm" readonly></div>
+                        <div class="grupo-form"><label for="etq-altura">Altura de cada etiqueta (mm)</label><input id="etq-altura" type="number" min="20" max="100" step="1" value="30"></div>
+                        <div class="grupo-form"><label for="etq-conteudo">Informações na etiqueta</label><select id="etq-conteudo"><option value="completo">Nome, preço, unidade e código</option><option value="simples">Nome e preço</option><option value="codigo">Nome, preço e código</option></select></div>
+                    </div>
+                    <p style="background:#e8f5e9;padding:10px;border-radius:8px;color:#245b29;">Impressora do Windows: <strong>108Label Printer</strong>. Na janela de impressão, selecione esse driver, papel de 50 mm e escala 100%. A altura da página acompanha a medida escolhida.</p>
+                    <div class="busca" style="display:none;">
                     </div>
                     <table class="tabela">
                         <thead>
@@ -321,7 +330,7 @@
             janela.document.close();
         }
 
-        // ===== ETIQUETAS 50 MM / FLASHTOY =====
+        // ===== ETIQUETAS MECOLOUR Y2C / 108LABEL PRINTER =====
         let selecionadosEtq = {};
         function carregarEtiquetas(f='') {
             const termo=String(f).toLocaleLowerCase('pt-BR');
@@ -330,12 +339,43 @@
         }
         function selecionarEtq(id,marcado,qtd=1){if(marcado)selecionadosEtq[id]=Math.max(1,Math.min(100,parseInt(qtd,10)||1));else delete selecionadosEtq[id];}
         function toggleTodos(){const v=document.getElementById('check-todos').checked;document.querySelectorAll('.chk-etq').forEach(c=>selecionarEtq(Number(c.dataset.id),v,1));carregarEtiquetas(document.getElementById('busca-etq').value);}
-        function selecionarTodos(){produtos.forEach(p=>selecionadosEtq[p.id]=1);carregarEtiquetas(document.getElementById('busca-etq').value);}
+        function selecionarTodos(){produtos.forEach(p=>selecionadosEtq[p.id]=1);document.getElementById('check-todos').checked=true;carregarEtiquetas(document.getElementById('busca-etq').value);}
         function limparSelecao(){selecionadosEtq={};document.getElementById('check-todos').checked=false;carregarEtiquetas(document.getElementById('busca-etq').value);}
         function listaEtiquetas(){const l=[];for(const [id,q] of Object.entries(selecionadosEtq)){const p=produtos.find(x=>Number(x.id)===Number(id));if(p)for(let i=0;i<q;i++)l.push(p);}return l;}
-        function canvasEtiqueta(p){const c=document.createElement('canvas');c.width=600;c.height=360;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,600,360);x.strokeStyle='#222';x.lineWidth=5;x.strokeRect(4,4,592,352);x.textAlign='center';x.fillStyle='#111';let n=String(p.nome||'Produto');x.font='bold 40px Arial';while(x.measureText(n).width>550&&n.length>4)n=n.slice(0,-1);x.fillText(n,300,75);x.font='bold 86px Arial';x.fillStyle='#176b2c';x.fillText('R$ '+Number(p.preco).toFixed(2).replace('.',','),300,190);x.font='26px Arial';x.fillStyle='#333';x.fillText('POR '+String(p.unidade||'un').toUpperCase(),300,235);x.font='24px Arial';x.fillText('CÓD: '+String(p.codigo||''),300,290);x.font='18px Arial';x.fillText(String(cfg.nome||'HORTIFRUTI').toUpperCase().slice(0,38),300,330);return c;}
-        async function exportarEtiquetasFlashToy(){const l=listaEtiquetas();if(!l.length)return alert('Selecione pelo menos um produto.');const fs=[];for(let i=0;i<l.length;i++){const blob=await new Promise(ok=>canvasEtiqueta(l[i]).toBlob(ok,'image/png'));if(blob)fs.push(new File([blob],'etiqueta-'+String(l[i].codigo||i)+'.png',{type:'image/png'}));}if(!fs.length)return alert('Falha ao gerar imagens.');if(navigator.share&&navigator.canShare&&navigator.canShare({files:fs})){try{await navigator.share({files:fs,title:'Etiquetas Hortifruti',text:'Etiquetas de 50 mm para FlashToy'});return;}catch(e){if(e.name==='AbortError')return;}}for(const f of fs){const u=URL.createObjectURL(f),a=document.createElement('a');a.href=u;a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000);}alert('PNG gerados. Abra o FlashToy e importe as imagens para imprimir.');}
-        function gerarEtiquetas(){const l=listaEtiquetas();if(!l.length)return alert('Selecione pelo menos um produto.');const w=window.open('','_blank');if(!w)return alert('Permita pop-ups para imprimir.');const st=w.document.createElement('style');st.textContent='@page{size:50mm 30mm;margin:0}html,body{margin:0;padding:0}img{width:50mm;height:30mm;display:block;page-break-after:always}';w.document.head.appendChild(st);l.forEach(p=>{const im=w.document.createElement('img');im.src=canvasEtiqueta(p).toDataURL('image/png');w.document.body.appendChild(im);});w.document.close();w.onload=()=>{w.focus();w.print();};}
+        function gerarEtiquetas(){
+            const lista=listaEtiquetas();if(!lista.length)return alert('Selecione pelo menos um produto.');
+            const altura=Math.max(20,Math.min(100,Number(document.getElementById('etq-altura').value)||30));
+            const modo=document.getElementById('etq-conteudo').value;
+            const w=window.open('','_blank');if(!w)return alert('Permita pop-ups para imprimir as etiquetas.');
+            const d=w.document;d.open();
+            d.write('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Etiquetas HortiFruti</title><style>');
+            d.write('@page{size:50mm '+altura+'mm;margin:0}html,body{margin:0;padding:0;width:50mm;background:#fff;font-family:Arial,sans-serif}');
+            d.write('.etiqueta{width:50mm;height:'+altura+'mm;box-sizing:border-box;padding:2mm 2.5mm;display:flex;flex-direction:column;align-items:center;justify-content:space-around;overflow:hidden;page-break-after:always;break-after:page;text-align:center;color:#111}');
+            d.write('.nome{font-size:13pt;font-weight:700;line-height:1.08;max-width:100%;overflow-wrap:anywhere}.preco{font-size:25pt;line-height:1;font-weight:800;color:#176b2c;white-space:nowrap}.detalhe{font-size:9pt;line-height:1.1}.loja{font-size:7pt;max-width:100%;overflow:hidden}');
+            d.write('@media screen{body{margin:10mm auto;box-shadow:0 0 4px #888}.etiqueta{border:1px dashed #bbb}}</style></head><body>');
+            lista.forEach(p=>{
+                const el=d.createElement('section');el.className='etiqueta';
+                const n=d.createElement('div');n.className='nome';n.textContent=String(p.nome||'Produto');el.appendChild(n);
+                const v=d.createElement('div');v.className='preco';v.textContent='R$ '+Number(p.preco||0).toFixed(2).replace('.',',');el.appendChild(v);
+                const info=d.createElement('div');info.className='detalhe';info.textContent=modo==='simples'?'POR '+String(p.unidade||'un').toUpperCase():(modo==='completo'?'POR '+String(p.unidade||'un').toUpperCase()+' | ':'')+'CÓD: '+String(p.codigo||'');el.appendChild(info);
+                const loja=d.createElement('div');loja.className='loja';loja.textContent=String(cfg.nome||'HORTIFRUTI');el.appendChild(loja);d.body.appendChild(el);
+            });
+            d.close();w.addEventListener('load',()=>{w.focus();w.print();});setTimeout(()=>{if(!w.closed){w.focus();w.print();}},800);
+        }
+        async function exportarEtiquetasFlashToy(){
+            const l=listaEtiquetas();if(!l.length)return alert('Selecione pelo menos um produto.');
+            const altura=Math.max(20,Math.min(100,Number(document.getElementById('etq-altura').value)||30)),fs=[];
+            for(let i=0;i<l.length;i++){
+                const c=document.createElement('canvas');c.width=400;c.height=Math.round(400*altura/50);const x=c.getContext('2d');
+                x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.textAlign='center';x.fillStyle='#111';x.font='bold 25px Arial';x.fillText(String(l[i].nome||'Produto').slice(0,32),200,Math.max(35,c.height*.23));
+                x.font='bold 48px Arial';x.fillStyle='#176b2c';x.fillText('R$ '+Number(l[i].preco||0).toFixed(2).replace('.',','),200,c.height*.55);
+                x.font='16px Arial';x.fillStyle='#333';x.fillText('CÓD: '+String(l[i].codigo||''),200,c.height*.76);x.font='12px Arial';x.fillText(String(cfg.nome||'HORTIFRUTI').slice(0,38),200,c.height*.91);
+                const blob=await new Promise(ok=>c.toBlob(ok,'image/png'));if(blob)fs.push(new File([blob],'etiqueta-'+String(l[i].codigo||i)+'.png',{type:'image/png'}));
+            }
+            if(!fs.length)return alert('Falha ao gerar imagens.');
+            for(const f of fs){const u=URL.createObjectURL(f),a=document.createElement('a');a.href=u;a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000);}
+            alert('Arquivos PNG gerados para importar no FlashToy.');
+        }
         document.getElementById('busca-etq').addEventListener('input',e=>carregarEtiquetas(e.target.value));
         // ===== ATALHOS =====
         document.addEventListener('keydown', e => { if (e.key === 'F9') { e.preventDefault(); window.location.href = 'index.html'; }});
