@@ -114,7 +114,8 @@ declare
   v_total numeric(12, 2) := 0;
   v_count integer := 0;
 begin
-  if jsonb_typeof(p_items) <> 'array'
+  if p_items is null
+     or jsonb_typeof(p_items) is distinct from 'array'
      or jsonb_array_length(p_items) < 1
      or jsonb_array_length(p_items) > 100 then
     raise exception 'O pedido deve conter entre 1 e 100 itens.';
@@ -182,6 +183,17 @@ $$;
 revoke all on function public.create_customer_order(jsonb, text, text, text) from public;
 grant execute on function public.create_customer_order(jsonb, text, text, text) to anon, authenticated;
 grant execute on function public.hortifruti_is_admin() to anon, authenticated;
+
+-- Permissões explícitas da API: pedidos só são acessíveis pelo administrador autenticado.
+revoke all on public.products from anon, authenticated;
+grant select on public.products to anon, authenticated;
+grant insert, update, delete on public.products to authenticated;
+
+revoke all on public.customer_orders from anon, authenticated;
+grant select, update on public.customer_orders to authenticated;
+
+revoke all on public.customer_order_items from anon, authenticated;
+grant select on public.customer_order_items to authenticated;
 
 -- O cliente público não recebe permissão de leitura dos pedidos.
 -- O PDV autenticado como administrador poderá consultar e atualizar pedidos.
