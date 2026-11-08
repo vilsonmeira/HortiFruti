@@ -208,28 +208,21 @@ document.getElementById('btn-finalizar').addEventListener('click', () => {
     if (carrinho.length === 0) return alert('Carrinho vazio!');
     if (!formaPagamento) return alert('Selecione a forma de pagamento!');
 
+    // Modo de operação sem estoque obrigatório:
+    // a venda registra as quantidades, mas não consulta nem altera o saldo de estoque.
     for (const item of carrinho) {
         const p = produtos.find(x => Number(x.id) === Number(item.produtoId));
         const quantidade = numeroValido(item.quantidade, Number.MIN_VALUE);
         const preco = numeroValido(item.preco, 0);
-        const estoque = numeroValido(p?.estoque ?? 0, 0);
-        if (!p || quantidade === null || preco === null || estoque === null) {
-            return alert('Venda não finalizada: produto, preço, quantidade ou estoque inválido.');
-        }
-        if (estoque < quantidade) {
-            return alert(`Estoque insuficiente para ${p.nome}. Disponível: ${estoque}.`);
+        if (!p || quantidade === null || preco === null) {
+            return alert('Venda não finalizada: produto, preço ou quantidade inválido.');
         }
     }
 
     const subtotal = carrinho.reduce((s, i) => s + (Number(i.preco) * Number(i.quantidade)), 0);
     if (!Number.isFinite(subtotal) || subtotal <= 0) return alert('Total da venda inválido.');
 
-    const produtosAntes = JSON.stringify(produtos);
     const vendasAntes = JSON.stringify(historicoVendas);
-    carrinho.forEach(item => {
-        const p = produtos.find(x => Number(x.id) === Number(item.produtoId));
-        p.estoque = Number(p.estoque || 0) - Number(item.quantidade);
-    });
 
     const venda = {
         id: Date.now(),
@@ -244,7 +237,6 @@ document.getElementById('btn-finalizar').addEventListener('click', () => {
     historicoVendas.push(venda);
 
     if (!salvarTudo()) {
-        produtos = JSON.parse(produtosAntes);
         historicoVendas = JSON.parse(vendasAntes);
         return alert('Venda não registrada: falha ao salvar os dados. O carrinho foi mantido. Verifique o armazenamento e tente novamente.');
     }
