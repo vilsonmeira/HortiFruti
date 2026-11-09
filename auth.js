@@ -41,10 +41,13 @@
   const erro = document.getElementById('pdv-auth-error');
   const submit = document.getElementById('pdv-auth-submit');
   let cliente;
+  let recoveryFormShown = false;
 
   function mostrarErro(msg) { erro.textContent = msg; }
 
   function mostrarFormularioNovaSenha() {
+    if (recoveryFormShown) return;
+    recoveryFormShown = true;
     const card = document.getElementById('pdv-auth-card');
     card.innerHTML = `
       <h2>🔐 Criar nova senha</h2>
@@ -114,15 +117,19 @@
     window.pdvAuth = { user, papel, supabase: cliente };
   }
   async function validarAcesso(user) {
-    const { data, error } = await cliente.from('perfis').select('papel,ativo').eq('id', user.id).maybeSingle();
+    const { data, error } = await cliente.from('perfis').select('id,nome,email,papel,perfil,ativo').eq('id', user.id).maybeSingle();
     if (error) throw new Error('Não foi possível consultar seu perfil: ' + error.message);
-    if (!data || !['gerente','operador'].includes(data.papel)) throw new Error('Seu usuário não possui um perfil válido. Peça ao gerente para cadastrá-lo.');
+    if (!data) throw new Error('Esta conta ainda não possui perfil cadastrado. Peça ao gerente para vinculá-la.');
+    if (data.email && data.email.toLowerCase() !== user.email.toLowerCase()) throw new Error('O e-mail do perfil não corresponde à conta autenticada. Peça ao gerente para corrigir o cadastro.');
+    if (data.papel && data.perfil && data.papel !== data.perfil) throw new Error('O cadastro possui divergência entre papel e perfil. Peça ao gerente para corrigir.');
+    const papel = data.papel || data.perfil;
+    if (!['gerente','operador'].includes(papel)) throw new Error('Seu usuário não possui um perfil válido. Peça ao gerente para cadastrá-lo.');
     if (data.ativo !== true) throw new Error('Este usuário está inativo. Peça ao gerente para reativar o acesso.');
-    if (exigeGerente && data.papel !== 'gerente') {
+    if (exigeGerente && papel !== 'gerente') {
       location.replace('index.html');
       return false;
     }
-    liberar(user, data.papel);
+    liberar(user, papel);
     return true;
   }
 
@@ -131,7 +138,11 @@
       bloquear('Não foi possível carregar o serviço de autenticação. Verifique sua conexão e atualize a página.');
       return;
     }
-    cliente = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+    cliente = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+    cliente.auth.onAuthStateChange((event) => {
+      // A recuperação pode chegar como evento mesmo quando o provedor retorna ?code=.
+      if (event === 'PASSWORD_RECOVERY') setTimeout(mostrarFormularioNovaSenha, 0);
+    });
     const { data, error } = await cliente.auth.getSession();
     if (error) { mostrarErro('Erro ao verificar sessão: ' + error.message); return; }
     const parametrosRetorno = new URLSearchParams(location.hash.replace(/^#/, ''));
@@ -190,12 +201,17 @@
       const password = document.getElementById('pdv-auth-password').value;
       const { data: login, error: loginError } = await cliente.auth.signInWithPassword({ email, password });
       if (loginError) {
-        mostrarErro('E-mail ou senha inválidos. ' + loginError.message);
+        const detalhe = String(loginError.message || '').toLowerCase();
+        mostrarErro(detalhe.includes('invalid login credentials')
+          ? 'E-mail ou senha incorretos. Confira os dados e tente novamente.'
+          : detalhe.includes('too many requests') || detalhe.includes('rate limit')
+            ? 'Muitas tentativas. Aguarde alguns minutos e tente novamente.'
+            : 'Não foi possível entrar. Verifique sua conexão ou recupere sua senha.');
       } else {
         try { await validarAcesso(login.user); }
         catch (e) {
           await cliente.auth.signOut();
-          mostrarErro(e.message);
+          mostrarErro(e.message || 'Não foi possível validar seu perfil.');
         }
       }
       submit.disabled = false; submit.textContent = 'Entrar no PDV';
