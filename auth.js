@@ -7,6 +7,7 @@
   const pagina = location.pathname.split('/').pop() || 'index.html';
   const exigeGerente = ['usuarios.html', 'admin-senhas.html'].includes(pagina);
   const permissoesGestao = ['produtos','estoque','fechamento','relatorios','configuracoes'];
+  const nomesPapeis = {gerente:'Gerente Master',operador:'Operador',vendedor:'Vendedor',financeiro:'Financeiro',estoquista:'Estoquista'};
   let cliente;
   let recoveryFormShown = false;
 
@@ -121,7 +122,7 @@
     const faixa = document.createElement('div');
     faixa.id = 'pdv-auth-user';
     const nome = document.createElement('span');
-    nome.textContent = (nomePerfil || user.user_metadata?.nome || 'Usuário') + ' · ' + (papel === 'gerente' ? 'Gerente Master' : 'Operador');
+    nome.textContent = (nomePerfil || user.user_metadata?.nome || 'Usuário') + ' · ' + (nomesPapeis[papel] || 'Operador');
     if (papel === 'gerente') {
       const senhas = document.createElement('a');
       senhas.href = 'admin-senhas.html';
@@ -175,7 +176,7 @@
       throw new Error('O cadastro possui divergência entre papel e perfil. Solicite a correção ao administrador.');
     }
     const papel = data.papel || data.perfil;
-    if (!['gerente', 'operador'].includes(papel)) throw new Error('Seu usuário não possui um perfil válido.');
+    if (!['gerente', 'operador', 'vendedor', 'financeiro', 'estoquista'].includes(papel)) throw new Error('Seu usuário não possui um perfil válido.');
     if (data.ativo !== true) throw new Error('Este usuário está inativo. Solicite ao gerente a reativação do acesso.');
     const permissoes = data.permissoes || {vendas:true};
     if (exigeGerente && papel !== 'gerente') throw new Error('Esta área é exclusiva do Gerente Master.');
