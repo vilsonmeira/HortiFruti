@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HortiFruti - Senhas</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="cabecalho"><div class="logo"><span class="fruta">🍉</span><h1>HortiFruti <span>Senhas</span></h1></div><div class="navegacao"><a href="gestao.html">Gestão</a> <a href="index.html">PDV</a></div></header>
+<main style="max-width:680px;margin:28px auto;padding:16px">
+<section style="background:white;padding:24px;border-radius:12px">
+<h2>Redefinir senha de usuário</h2>
+<p>Área exclusiva do gerente. A senha será atualizada no Authentication do Supabase.</p>
+<form id="form-senha">
+<label for="email">Usuário</label>
+<select id="email" required>
+<option value="vilsonmeira33@gmail.com">Vilson — Gerente</option>
+<option value="dalvacisouzameira@gmail.com">Dalva — Operadora</option>
+</select>
+<label for="nova">Nova senha (mínimo 10 caracteres)</label>
+<input id="nova" type="password" minlength="10" maxlength="72" autocomplete="new-password" required>
+<label for="confirmar">Confirmar senha</label>
+<input id="confirmar" type="password" minlength="10" maxlength="72" autocomplete="new-password" required>
+<button class="btn-acao btn-primario" id="salvar" type="submit">Atualizar senha</button>
+</form>
+<p id="status" role="status" aria-live="polite"></p>
+<p>Use uma senha exclusiva. Ela não será exibida nem armazenada nesta página.</p>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js"></script>
+<script>
+document.getElementById('form-senha').addEventListener('submit', async (event) => {
+ event.preventDefault();
+ const email = document.getElementById('email').value;
+ const password = document.getElementById('nova').value;
+ const confirmation = document.getElementById('confirmar').value;
+ const status = document.getElementById('status');
+ const button = document.getElementById('salvar');
+ status.textContent = '';
+ if (password !== confirmation) { status.textContent = 'As senhas não coincidem.'; return; }
+ const client = window.pdvAuth && window.pdvAuth.supabase;
+ if (!client) { status.textContent = 'Sessão não encontrada. Entre novamente.'; return; }
+ button.disabled = true;
+ const result = await client.functions.invoke('admin-reset-password', { body: { email, password } });
+ if (result.error || !result.data || !result.data.success) {
+  status.textContent = (result.data && result.data.error) || (result.error && result.error.message) || 'Falha ao atualizar.';
+ } else {
+  status.textContent = 'Senha atualizada com sucesso para ' + email + '.';
+  document.getElementById('form-senha').reset();
+ }
+ button.disabled = false;
+});
+</script>
+</body>
+</html>
