@@ -27,8 +27,8 @@
     <h2 id="pdv-auth-title">🍉 HortiFruti PDV</h2>
     <p>Entre com seu CPF e senha cadastrados no sistema.</p>
     <form id="pdv-auth-form">
-      <label for="pdv-auth-email">E-mail</label>
-      <input id="pdv-auth-email" type="email" autocomplete="username" required>
+      <label for="pdv-auth-cpf">CPF</label>
+      <input id="pdv-auth-cpf" type="text" inputmode="numeric" autocomplete="username" maxlength="14" placeholder="000.000.000-00" required>
       <label for="pdv-auth-password">Senha</label>
       <input id="pdv-auth-password" type="password" autocomplete="current-password" required>
       <div id="pdv-auth-error" role="alert"></div>
