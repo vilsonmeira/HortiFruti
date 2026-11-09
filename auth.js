@@ -170,8 +170,11 @@
     document.getElementById('pdv-auth-form').addEventListener('submit', async (event) => {
       event.preventDefault();
       submit.disabled = true; submit.textContent = 'Verificando...'; mostrarErro('');
-      const email = document.getElementById('pdv-auth-email').value.trim();
+      const cpf = document.getElementById('pdv-auth-cpf').value.trim();
       const password = document.getElementById('pdv-auth-password').value;
+      const numeros = cpf.replace(/\D/g, '');
+      if (numeros.length !== 11) { mostrarErro('Digite um CPF com 11 números.'); submit.disabled = false; submit.textContent = 'Entrar no PDV'; return; }
+      const email = await cpfParaEmail(numeros);
       const { data: login, error: loginError } = await cliente.auth.signInWithPassword({ email, password });
       if (loginError) {
         const detalhe = String(loginError.message || '').toLowerCase();
