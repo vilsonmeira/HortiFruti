@@ -25,7 +25,7 @@
   tela.id = 'pdv-auth-screen';
   tela.innerHTML = `<section id="pdv-auth-card" role="dialog" aria-modal="true" aria-labelledby="pdv-auth-title">
     <h2 id="pdv-auth-title">🍉 HortiFruti PDV</h2>
-    <p>Entre com seu e-mail e senha cadastrados no sistema.</p>
+    <p>Entre com seu CPF e senha cadastrados no sistema.</p>
     <form id="pdv-auth-form">
       <label for="pdv-auth-email">E-mail</label>
       <input id="pdv-auth-email" type="email" autocomplete="username" required>
@@ -33,7 +33,7 @@
       <input id="pdv-auth-password" type="password" autocomplete="current-password" required>
       <div id="pdv-auth-error" role="alert"></div>
       <button id="pdv-auth-submit" type="submit">Entrar no PDV</button>
-      <button id="pdv-auth-forgot" type="button">Esqueci minha senha</button>
+      <p style="text-align:center;margin:12px 0 0"><a href="primeiro-acesso.html" style="color:#246b2b">Primeiro acesso: configurar gerente</a></p>
     </form>
   </section>`;
   document.body.appendChild(tela);
@@ -97,7 +97,7 @@
     const faixa = document.createElement('div');
     faixa.id = 'pdv-auth-user';
     const nome = document.createElement('span');
-    nome.textContent = (user.email || 'Usuário') + ' · ' + papel;
+    nome.textContent = (user.user_metadata?.nome || 'Usuário') + ' · ' + papel;
     if (papel === 'gerente') {
       const senhas = document.createElement('a');
       senhas.href = 'admin-senhas.html';
@@ -116,7 +116,7 @@
     document.body.appendChild(faixa);
     window.pdvAuth = { user, papel, supabase: cliente };
   }
-  async function validarAcesso(user) {
+  async function cpfParaEmail(valor) {\n    const cpf = String(valor).replace(/\\D/g, '');\n    const bytes = new TextEncoder().encode('hortifruti-pdv-cpf:' + cpf);\n    const digest = await crypto.subtle.digest('SHA-256', bytes);\n    const hex = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');\n    return 'cpf-' + hex + '@login.hortifruti.com';\n  }\n\n  async function validarAcesso(user) {
     const { data, error } = await cliente.from('perfis').select('id,nome,email,papel,perfil,ativo').eq('id', user.id).maybeSingle();
     if (error) throw new Error('Não foi possível consultar seu perfil: ' + error.message);
     if (!data) throw new Error('Esta conta ainda não possui perfil cadastrado. Peça ao gerente para vinculá-la.');
@@ -129,7 +129,7 @@
       location.replace('index.html');
       return false;
     }
-    liberar(user, papel);
+    liberar(user, papel, data.nome);
     return true;
   }
 
@@ -165,35 +165,8 @@
       try { await validarAcesso(data.session.user); }
       catch (e) { bloquear(e.message); }
     } else {
-      document.getElementById('pdv-auth-email').focus();
+      document.getElementById('pdv-auth-cpf').focus();
     }
-    document.getElementById('pdv-auth-forgot').addEventListener('click', async () => {
-      const email = document.getElementById('pdv-auth-email').value.trim();
-      if (!email) {
-        mostrarErro('Digite seu e-mail para receber o link de recuperação.');
-        document.getElementById('pdv-auth-email').focus();
-        return;
-      }
-      submit.disabled = true;
-      submit.textContent = 'Enviando...';
-      mostrarErro('');
-      const redirectTo = location.origin + location.pathname;
-      const botaoRecuperar = document.getElementById('pdv-auth-forgot');
-      botaoRecuperar.disabled = true;
-      botaoRecuperar.textContent = 'Enviando link...';
-      const { error: recoveryError } = await cliente.auth.resetPasswordForEmail(email, { redirectTo });
-      if (recoveryError) {
-        mostrarErro('Não foi possível enviar o link: ' + recoveryError.message);
-        botaoRecuperar.textContent = 'Tentar enviar novamente';
-      } else {
-        mostrarErro('Solicitação enviada. Verifique sua caixa de entrada e o spam. Use somente o link mais recente recebido.');
-        botaoRecuperar.textContent = 'Enviar outro link de recuperação';
-      }
-      botaoRecuperar.disabled = false;
-      submit.disabled = false;
-      submit.textContent = 'Entrar no PDV';
-    });
-
     document.getElementById('pdv-auth-form').addEventListener('submit', async (event) => {
       event.preventDefault();
       submit.disabled = true; submit.textContent = 'Verificando...'; mostrarErro('');
@@ -203,7 +176,7 @@
       if (loginError) {
         const detalhe = String(loginError.message || '').toLowerCase();
         mostrarErro(detalhe.includes('invalid login credentials')
-          ? 'E-mail ou senha incorretos. Confira os dados e tente novamente.'
+          ? 'CPF ou senha incorretos. Confira os dados e tente novamente.'
           : detalhe.includes('too many requests') || detalhe.includes('rate limit')
             ? 'Muitas tentativas. Aguarde alguns minutos e tente novamente.'
             : 'Não foi possível entrar. Verifique sua conexão ou recupere sua senha.');
