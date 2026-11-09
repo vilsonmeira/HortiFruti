@@ -23,8 +23,8 @@
       'html,body{width:50mm;margin:0;padding:0;background:#fff;color:#000}' +
       'body{font-family:Arial,sans-serif}' +
       'pre{box-sizing:border-box;width:48mm;margin:0;padding:0;border:0;' +
-      'font-family:"Courier New",monospace;font-size:9px;line-height:1.28;' +
-      'font-weight:600;white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal}' +
+      'font-family:"Courier New",monospace;font-size:7px;line-height:1.2;' +
+      'font-weight:400;white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal}' +
       '@media screen{body{padding:4mm 1mm}pre{width:48mm}}' +
       '</style></head><body><pre></pre></body></html>');
     documento.close();
