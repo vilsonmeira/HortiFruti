@@ -81,3 +81,4 @@ Deno.serve(async (req: Request) => {
     return json({ error: "Não foi possível concluir a redefinição. Tente novamente." }, 500);
   }
 });
+https://vcyneajmmwvvnefqompe.supabase.co/functions/v1/quick-function
