@@ -41,8 +41,8 @@ body{background:#f4f7f2}.usuarios-wrap{max-width:1100px;margin:24px auto;padding
 (() => {
  const URL='https://vcyneajmmwvvnefqompe.supabase.co';
  const KEY='sb_publishable_fOe9mU2A_48YLPKq1NB6ZQ_Hg_GZaym';
- const labels={vendas:'Vendas / PDV',produtos:'Produtos',estoque:'Estoque',fechamento:'Fechamento',relatorios:'Relatórios e consultas',configuracoes:'Configurações',usuarios:'Gerenciar usuários'};
- const defaults={vendas:true,produtos:false,estoque:false,fechamento:false,relatorios:false,configuracoes:false,usuarios:false};
+ const labels={vendas:'Vendas / PDV',produtos:'Produtos',estoque:'Estoque',fechamento:'Fechamento',relatorios:'Relatórios e consultas',configuracoes:'Configurações'};
+ const defaults={vendas:true,produtos:false,estoque:false,fechamento:false,relatorios:false,configuracoes:false};
  const supabase=window.supabase.createClient(URL,KEY);
  const $=id=>document.getElementById(id);
  const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
