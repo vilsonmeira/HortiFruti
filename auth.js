@@ -134,9 +134,20 @@
     const { data, error } = await cliente.auth.getSession();
     if (error) { mostrarErro('Erro ao verificar sessão: ' + error.message); return; }
     const parametrosRetorno = new URLSearchParams(location.hash.replace(/^#/, ''));
+    const codigoErro = parametrosRetorno.get('error_code');
+    const descricaoErro = parametrosRetorno.get('error_description');
     if (parametrosRetorno.get('type') === 'recovery') {
       mostrarFormularioNovaSenha();
       return;
+    }
+    if (codigoErro || parametrosRetorno.get('error')) {
+      const expirado = codigoErro === 'otp_expired' || (descricaoErro || '').toLowerCase().includes('expired');
+      mostrarErro(expirado
+        ? 'Este link de recuperação expirou ou já foi utilizado. Digite seu e-mail e clique em “Enviar novo link de recuperação”.'
+        : 'Não foi possível validar o link de recuperação. Digite seu e-mail e solicite um novo link.');
+      const botaoRecuperar = document.getElementById('pdv-auth-forgot');
+      if (botaoRecuperar) botaoRecuperar.textContent = 'Enviar novo link de recuperação';
+      history.replaceState(null, document.title, location.pathname + location.search);
     }
     if (data.session) {
       try { await validarAcesso(data.session.user); }
@@ -155,12 +166,18 @@
       submit.textContent = 'Enviando...';
       mostrarErro('');
       const redirectTo = location.origin + location.pathname;
+      const botaoRecuperar = document.getElementById('pdv-auth-forgot');
+      botaoRecuperar.disabled = true;
+      botaoRecuperar.textContent = 'Enviando link...';
       const { error: recoveryError } = await cliente.auth.resetPasswordForEmail(email, { redirectTo });
       if (recoveryError) {
         mostrarErro('Não foi possível enviar o link: ' + recoveryError.message);
+        botaoRecuperar.textContent = 'Tentar enviar novamente';
       } else {
-        mostrarErro('Se o e-mail estiver cadastrado, você receberá um link para criar uma nova senha. Verifique também o spam.');
+        mostrarErro('Solicitação enviada. Verifique sua caixa de entrada e o spam. Use somente o link mais recente recebido.');
+        botaoRecuperar.textContent = 'Enviar outro link de recuperação';
       }
+      botaoRecuperar.disabled = false;
       submit.disabled = false;
       submit.textContent = 'Entrar no PDV';
     });
