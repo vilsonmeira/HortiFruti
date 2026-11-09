@@ -1,0 +1,14 @@
+(() => {
+'use strict';
+const URL='https://vcyneajmmwvvnefqompe.supabase.co/functions/v1/pdv-clientes-recibo';
+const $=id=>document.getElementById(id);
+function status(t,erro=false){$('status').textContent=t;$('status').style.color=erro?'#b3261e':'#375b35';}
+async function authReady(){if(window.pdvAuth?.supabase)return window.pdvAuth;return await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('Faça login novamente.')),12000);window.addEventListener('pdv-auth-ready',e=>{clearTimeout(timer);resolve(e.detail)},{once:true});});}
+async function api(action,data={}){const a=await authReady();const {data:s}=await a.supabase.auth.getSession();const res=await fetch(URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':a.supabase.supabaseKey,'Authorization':'Bearer '+(s.session?.access_token||'')},body:JSON.stringify({action,...data})});const j=await res.json();if(!res.ok)throw new Error(j.error||'Falha na operação.');return j;}
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function carregar(){try{status('Carregando cadastros...');const r=await api('customer_pending_list');const rows=r.clientes||[];$('lista').innerHTML=rows.length?rows.map(c=>{const tel=String(c.telefone||'').replace(/\D/g,'');const wa=tel?'https://wa.me/55'+tel+'?text='+encodeURIComponent('Olá '+c.nome+', estamos conferindo sua solicitação de cadastro no HortiFruti.'):'#';return '<tr><td>'+esc(c.nome)+'</td><td>'+esc(c.cpf)+'</td><td>'+esc(c.telefone||'—')+'</td><td>'+new Date(c.criado_em).toLocaleString('pt-BR')+'</td><td><a class="btn whats" target="_blank" rel="noopener" href="'+wa+'">WhatsApp</a> <button class="btn aprovar" data-id="'+esc(c.id)+'">Aprovar</button></td></tr>';}).join(''):'<tr><td colspan="5">Nenhum cadastro pendente.</td></tr>';status(rows.length+' solicitação(ões) pendente(s). Confirme a mensagem recebida pela loja antes de aprovar.');}catch(e){status(e.message,true);}}
+$('lista').addEventListener('click',async e=>{const b=e.target.closest('button[data-id]');if(!b)return;if(!confirm('Você conferiu a mensagem recebida no WhatsApp e deseja aprovar este cadastro?'))return;b.disabled=true;try{await api('customer_approve',{id:b.dataset.id});status('Cadastro aprovado.');await carregar();}catch(err){status(err.message,true);b.disabled=false;}});
+$('atualizar').addEventListener('click',carregar);
+document.addEventListener('pdv-auth-ready',e=>{if(e.detail.papel!=='gerente'){status('Acesso restrito ao gerente.',true);return;}carregar();});
+if(window.pdvAuth){if(window.pdvAuth.papel==='gerente')carregar();else status('Acesso restrito ao gerente.',true);}
+})();
