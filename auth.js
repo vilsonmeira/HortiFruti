@@ -115,7 +115,7 @@
     document.body.appendChild(faixa);
     window.pdvAuth = { user, papel, supabase: cliente };
   }
-  async function cpfParaEmail(valor) {\n    const cpf = String(valor).replace(/\\D/g, '');\n    const bytes = new TextEncoder().encode('hortifruti-pdv-cpf:' + cpf);\n    const digest = await crypto.subtle.digest('SHA-256', bytes);\n    const hex = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');\n    return 'cpf-' + hex + '@login.hortifruti.com';\n  }\n\n  async function validarAcesso(user) {
+  async function cpfParaEmail(valor) {\n    const cpf = String(valor).replace(/\D/g, '');\n    const bytes = new TextEncoder().encode('hortifruti-pdv-cpf:' + cpf);\n    const digest = await crypto.subtle.digest('SHA-256', bytes);\n    const hex = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');\n    return 'cpf-' + hex + '@login.hortifruti.com';\n  }\n\n  async function validarAcesso(user) {
     const { data, error } = await cliente.from('perfis').select('id,nome,email,papel,perfil,ativo').eq('id', user.id).maybeSingle();
     if (error) throw new Error('Não foi possível consultar seu perfil: ' + error.message);
     if (!data) throw new Error('Esta conta ainda não possui perfil cadastrado. Peça ao gerente para vinculá-la.');
