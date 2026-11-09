@@ -1377,6 +1377,7 @@ window.CATALOGO_PRODUTOS = [
   }
 ];
 window.mesclarCatalogoProdutos = function (atuais) {
+  try { if (localStorage.getItem("catalogoProdutosVersao") === "1") return Array.isArray(atuais) ? atuais : []; } catch (_) {}
   const exemplos = new Set(["Maçã Fuji","Banana Prata","Laranja Pera"]);
   let lista = Array.isArray(atuais) ? [...atuais] : [];
   if (lista.length === 3 && lista.every(p => exemplos.has(p.nome))) lista = [];
@@ -1385,5 +1386,6 @@ window.mesclarCatalogoProdutos = function (atuais) {
     const chave = String(item.codigo).trim()+"|"+item.nome.toLocaleLowerCase("pt-BR");
     if (!chaves.has(chave)) { lista.push({...item}); chaves.add(chave); }
   }
+  try { localStorage.setItem("catalogoProdutosVersao", "1"); } catch (_) {}
   return lista;
 };
