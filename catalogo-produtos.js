@@ -1181,7 +1181,7 @@ window.CATALOGO_PRODUTOS = [
     "id": 10108,
     "codigo": "100",
     "nome": "Produtos Aleatórios de R$ 2,99",
-    "preco": 0,
+    "preco": 2.99,
     "unidade": "un",
     "categoria": "outros",
     "emoji": "🛒",
