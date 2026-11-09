@@ -447,7 +447,9 @@
                 preco: parseFloat(document.getElementById('prod-preco').value),
                 unidade: document.getElementById('prod-und').value,
                 estoque: parseFloat(document.getElementById('prod-est').value || 0),
-                minimo: parseFloat(document.getElementById('prod-min').value || 5)
+                minimo: parseFloat(document.getElementById('prod-min').value || 5),
+                quantidadeMinimaDesconto: parseFloat(document.getElementById('prod-qtd-promo').value || 0),
+                descontoPercentual: parseFloat(document.getElementById('prod-desc-promo').value || 0)
             };
             if (!dados.nome.trim()) return alert('O nome do produto é obrigatório!');
             if (!Number.isFinite(dados.preco) || dados.preco <= 0) return alert('Preço deve ser maior que zero!');
