@@ -1377,7 +1377,6 @@ window.CATALOGO_PRODUTOS = [
   }
 ]
 window.mesclarCatalogoProdutos = function (atuais) {
-  try { if (localStorage.getItem("catalogoProdutosVersao") === "3") return Array.isArray(atuais) ? atuais : []; } catch (_) {}
   const exemplos = new Set(["Maçã Fuji","Banana Prata","Laranja Pera"]);
   let lista = Array.isArray(atuais) ? [...atuais] : [];
   if (lista.length === 3 && lista.every(p => exemplos.has(p.nome))) lista = [];
@@ -1386,13 +1385,13 @@ window.mesclarCatalogoProdutos = function (atuais) {
     const chave = String(item.codigo).trim()+"|"+item.nome.toLocaleLowerCase("pt-BR");
     if (!chaves.has(chave)) { lista.push({...item}); chaves.add(chave); }
   }
-  try { localStorage.setItem("catalogoProdutosVersao", "3"); } catch (_) {}
   const emojis = new Map(window.CATALOGO_PRODUTOS.map(p => [String(p.codigo).trim()+"|"+p.nome.toLocaleLowerCase("pt-BR"), p.emoji]));
-  for (const p of lista) { const chave = String(p.codigo ?? "").trim()+"|"+String(p.nome ?? "").trim().toLocaleLowerCase("pt-BR"); if (emojis.has(chave)) p.emoji = emojis.get(chave); }
-  try { localStorage.setItem("catalogoProdutosVersao", "3"); } catch (_) {}
   for (const p of lista) {
+    const chave = String(p.codigo ?? "").trim()+"|"+String(p.nome ?? "").trim().toLocaleLowerCase("pt-BR");
+    if (emojis.has(chave)) p.emoji = emojis.get(chave);
     p.preco = 9.99;
     if (Number(p.id) === 10108) p.nome = "Produtos Aleatórios de R$ 9,99";
   }
+  try { localStorage.setItem("catalogoProdutosVersao", "4"); } catch (_) {}
   return lista;
 };
