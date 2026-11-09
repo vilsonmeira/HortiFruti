@@ -4,7 +4,7 @@
   const SUPABASE_URL = 'https://vcyneajmmwvvnefqompe.supabase.co';
   const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_fOe9mU2A_48YLPKq1NB6ZQ_Hg_GZaym';
   const pagina = location.pathname.split('/').pop() || 'index.html';
-  const exigeGerente = pagina === 'gestao.html' || pagina === 'vendas.html';
+  const exigeGerente = ['gestao.html', 'vendas.html', 'admin-senhas.html'].includes(pagina);
 
   const estilo = document.createElement('style');
   estilo.textContent = `
@@ -16,7 +16,7 @@
     #pdv-auth-card button{width:100%;padding:12px;margin-top:16px;border:0;border-radius:8px;background:#2e7d32;color:#fff;font-weight:700;font-size:16px;cursor:pointer}
     #pdv-auth-error{color:#b3261e;min-height:20px;font-size:14px}
     #pdv-auth-user{position:fixed;right:12px;top:12px;z-index:9998;background:#fff;padding:7px 10px;border-radius:8px;box-shadow:0 2px 8px #0002;font:12px Arial;display:flex;gap:8px;align-items:center}
-    #pdv-auth-user button{border:0;background:#e8f5e9;color:#205c25;border-radius:6px;padding:6px 9px;cursor:pointer}
+    #pdv-auth-user button,#pdv-auth-user a{border:0;background:#e8f5e9;color:#205c25;border-radius:6px;padding:6px 9px;cursor:pointer;text-decoration:none}
   `;
   document.head.appendChild(estilo);
 
@@ -51,6 +51,12 @@
     faixa.id = 'pdv-auth-user';
     const nome = document.createElement('span');
     nome.textContent = (user.email || 'Usuário') + ' · ' + papel;
+    if (papel === 'gerente') {
+      const senhas = document.createElement('a');
+      senhas.href = 'admin-senhas.html';
+      senhas.textContent = 'Senhas';
+      faixa.appendChild(senhas);
+    }
     const sair = document.createElement('button');
     sair.type = 'button'; sair.textContent = 'Sair';
     sair.addEventListener('click', async () => {
@@ -98,10 +104,8 @@
       if (loginError) {
         mostrarErro('E-mail ou senha inválidos. ' + loginError.message);
       } else {
-        try {
-          const ok = await validarAcesso(login.user);
-          // Operadores são direcionados ao caixa sem encerrar a sessão.
-        } catch (e) {
+        try { await validarAcesso(login.user); }
+        catch (e) {
           await cliente.auth.signOut();
           mostrarErro(e.message);
         }
