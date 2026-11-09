@@ -14,6 +14,7 @@
     #pdv-auth-card label{display:block;font-weight:600;margin:14px 0 6px}
     #pdv-auth-card input{box-sizing:border-box;width:100%;padding:12px;border:1px solid #ccd5cc;border-radius:8px;font-size:16px}
     #pdv-auth-card button{width:100%;padding:12px;margin-top:16px;border:0;border-radius:8px;background:#2e7d32;color:#fff;font-weight:700;font-size:16px;cursor:pointer}
+    #pdv-auth-forgot{display:block;width:100%;margin-top:12px;padding:8px;border:0;background:transparent;color:#246b2b;text-decoration:underline;cursor:pointer;font-size:14px}
     #pdv-auth-error{color:#b3261e;min-height:20px;font-size:14px}
     #pdv-auth-user{position:fixed;right:12px;top:12px;z-index:9998;background:#fff;padding:7px 10px;border-radius:8px;box-shadow:0 2px 8px #0002;font:12px Arial;display:flex;gap:8px;align-items:center}
     #pdv-auth-user button,#pdv-auth-user a{border:0;background:#e8f5e9;color:#205c25;border-radius:6px;padding:6px 9px;cursor:pointer;text-decoration:none}
@@ -32,6 +33,7 @@
       <input id="pdv-auth-password" type="password" autocomplete="current-password" required>
       <div id="pdv-auth-error" role="alert"></div>
       <button id="pdv-auth-submit" type="submit">Entrar no PDV</button>
+      <button id="pdv-auth-forgot" type="button">Esqueci minha senha</button>
     </form>
   </section>`;
   document.body.appendChild(tela);
@@ -41,6 +43,48 @@
   let cliente;
 
   function mostrarErro(msg) { erro.textContent = msg; }
+
+  function mostrarFormularioNovaSenha() {
+    const card = document.getElementById('pdv-auth-card');
+    card.innerHTML = `
+      <h2>🔐 Criar nova senha</h2>
+      <p>Digite sua nova senha para acessar o HortiFruti PDV.</p>
+      <form id="pdv-auth-reset-form">
+        <label for="pdv-auth-new-password">Nova senha</label>
+        <input id="pdv-auth-new-password" type="password" autocomplete="new-password" minlength="8" required>
+        <label for="pdv-auth-confirm-password">Confirmar nova senha</label>
+        <input id="pdv-auth-confirm-password" type="password" autocomplete="new-password" minlength="8" required>
+        <div id="pdv-auth-error" role="alert"></div>
+        <button id="pdv-auth-reset-submit" type="submit">Salvar nova senha</button>
+      </form>`;
+    const form = document.getElementById('pdv-auth-reset-form');
+    const msg = document.getElementById('pdv-auth-error');
+    const button = document.getElementById('pdv-auth-reset-submit');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const senha = document.getElementById('pdv-auth-new-password').value;
+      const confirmacao = document.getElementById('pdv-auth-confirm-password').value;
+      if (senha.length < 8) { msg.textContent = 'A senha deve ter pelo menos 8 caracteres.'; return; }
+      if (senha !== confirmacao) { msg.textContent = 'As senhas não coincidem.'; return; }
+      button.disabled = true;
+      button.textContent = 'Salvando...';
+      const { error } = await cliente.auth.updateUser({ password: senha });
+      if (error) {
+        msg.textContent = 'Não foi possível atualizar a senha: ' + error.message;
+        button.disabled = false;
+        button.textContent = 'Salvar nova senha';
+        return;
+      }
+      await cliente.auth.signOut();
+      history.replaceState(null, document.title, location.pathname + location.search);
+      card.innerHTML = `
+        <h2>✅ Senha atualizada</h2>
+        <p>Sua senha foi alterada com sucesso. Entre no PDV usando a nova senha.</p>
+        <button id="pdv-auth-back-login" type="button">Voltar para o login</button>`;
+      document.getElementById('pdv-auth-back-login').addEventListener('click', () => location.reload());
+    });
+  }
+
   function bloquear(msg) {
     tela.style.display = 'flex';
     mostrarErro(msg || 'Acesso não autorizado. Confira seu cadastro com o gerente.');
@@ -89,12 +133,38 @@
     cliente = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
     const { data, error } = await cliente.auth.getSession();
     if (error) { mostrarErro('Erro ao verificar sessão: ' + error.message); return; }
+    const parametrosRetorno = new URLSearchParams(location.hash.replace(/^#/, ''));
+    if (parametrosRetorno.get('type') === 'recovery') {
+      mostrarFormularioNovaSenha();
+      return;
+    }
     if (data.session) {
       try { await validarAcesso(data.session.user); }
       catch (e) { bloquear(e.message); }
     } else {
       document.getElementById('pdv-auth-email').focus();
     }
+    document.getElementById('pdv-auth-forgot').addEventListener('click', async () => {
+      const email = document.getElementById('pdv-auth-email').value.trim();
+      if (!email) {
+        mostrarErro('Digite seu e-mail para receber o link de recuperação.');
+        document.getElementById('pdv-auth-email').focus();
+        return;
+      }
+      submit.disabled = true;
+      submit.textContent = 'Enviando...';
+      mostrarErro('');
+      const redirectTo = location.origin + location.pathname;
+      const { error: recoveryError } = await cliente.auth.resetPasswordForEmail(email, { redirectTo });
+      if (recoveryError) {
+        mostrarErro('Não foi possível enviar o link: ' + recoveryError.message);
+      } else {
+        mostrarErro('Se o e-mail estiver cadastrado, você receberá um link para criar uma nova senha. Verifique também o spam.');
+      }
+      submit.disabled = false;
+      submit.textContent = 'Entrar no PDV';
+    });
+
     document.getElementById('pdv-auth-form').addEventListener('submit', async (event) => {
       event.preventDefault();
       submit.disabled = true; submit.textContent = 'Verificando...'; mostrarErro('');
