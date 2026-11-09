@@ -12,6 +12,15 @@
     <link rel="apple-touch-icon" href="icone-192.svg">
     <title>Hortifruti PDV — Ponto de Venda</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+      .painel-sugestoes{background:#fff;border:1px solid #dcebd7;border-radius:12px;padding:14px;box-shadow:0 2px 8px #00000008}
+      .painel-sugestoes[hidden]{display:none}.painel-sugestoes h4{color:#2e7d32;margin-bottom:7px}
+      .sugestoes-aviso{font-size:.76rem;color:#666;margin-bottom:8px}
+      .sugestao-produto{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-top:1px solid #eee}
+      .sugestao-produto>div{display:flex;flex-direction:column;gap:3px;min-width:0}
+      .sugestao-produto small{font-size:.73rem;color:#607d5b}.sugestao-produto span{font-size:.8rem;color:#444}
+      .btn-sugestao{border:0;border-radius:7px;padding:8px 10px;background:#e8f5e9;color:#256029;font-weight:600;cursor:pointer;white-space:nowrap}
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -68,6 +77,7 @@
                         </div>
                     </div>
                 </div>
+                <section class="painel-sugestoes" id="painel-sugestoes" hidden aria-live="polite"></section>
                 <div class="pagamento">
                     <h4>Forma de Pagamento</h4>
                     <div class="botoes-pagamento" id="botoes-pag">
@@ -89,6 +99,6 @@
     <script src="auth.js?v=20261109-roles1"></script>
     <script src="catalogo-produtos.js"></script>
     <script src="recibo.js"></script>
-    <script src="app.js?v=20261109-qtdpromo1"></script>
+    <script src="app.js?v=20261109-sugestoes1"></script>
 </body>
 </html>
