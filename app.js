@@ -89,7 +89,7 @@ function renderProdutos(filtro='', categoria='todos') {
         <div class="cartao-produto" data-id="${Number(p.id)}">
             <div class="emoji">${escapeHTML(p.emoji)}</div>
             <div class="nome">${escapeHTML(p.nome)}</div>
-            <div class="preco">R$ ${p.preco.toFixed(2)}</div>
+            <div class="preco">${p.preco > 0 ? `R$ ${p.preco.toFixed(2)}` : "Definir preço"}</div>
             <div class="unid">/${escapeHTML(p.unidade)}</div>
         </div>
     `).join('');
