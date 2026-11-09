@@ -5,7 +5,7 @@
   const SUPABASE_URL = 'https://vcyneajmmwvvnefqompe.supabase.co';
   const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_fOe9mU2A_48YLPKq1NB6ZQ_Hg_GZaym';
   const pagina = location.pathname.split('/').pop() || 'index.html';
-  const exigeGerente = ['master.html', 'usuarios.html', 'admin-senhas.html'].includes(pagina);
+  const exigeGerente = ['master.html', 'usuarios.html', 'admin-senhas.html', 'clientes-pendentes.html'].includes(pagina);
   const permissoesGestao = ['produtos','estoque','fechamento','relatorios','configuracoes'];
   const nomesPapeis = {gerente:'Gerente Master',operador:'Operador',vendedor:'Vendedor',financeiro:'Financeiro',estoquista:'Estoquista'};
   let cliente;
