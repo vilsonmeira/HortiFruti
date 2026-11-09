@@ -46,6 +46,7 @@ let cfg = carregarDados('configuracoes', {nome:'Hortifruti',cnpj:'',tel:'',cidad
 let carrinho = [];
 let formaPagamento = null;
 let produtoParaPesar = null;
+window.obterCarrinhoPDV = () => carrinho;
 
 // ===== SALVAR =====
 function salvarTudo() {
@@ -174,6 +175,7 @@ function atualizarCarrinho() {
         document.getElementById('total').textContent = 'R$ 0,00';
         formaPagamento = null;
         atualizarSugestoes();
+        window.atualizarComprovanteAoVivo?.();
         return;
     }
     const resumo = calcularResumoCarrinho();
@@ -198,6 +200,7 @@ function atualizarCarrinho() {
     document.getElementById('desconto-valor').textContent = `-R$ ${resumo.desconto.toFixed(2)}`;
     document.getElementById('total').textContent = `R$ ${resumo.total.toFixed(2)}`;
     atualizarSugestoes();
+    window.atualizarComprovanteAoVivo?.();
 }
 
 function atualizarSugestoes() {
@@ -235,7 +238,7 @@ document.querySelectorAll('.btn-pag').forEach(btn => {
 });
 
 // ===== FINALIZAR VENDA =====
-document.getElementById('btn-finalizar').addEventListener('click', () => {
+document.getElementById('btn-finalizar').addEventListener('click', async () => {
     if (carrinho.length === 0) return alert('Carrinho vazio!');
     if (!formaPagamento) return alert('Selecione a forma de pagamento!');
 
@@ -253,6 +256,8 @@ document.getElementById('btn-finalizar').addEventListener('click', () => {
     const resumo = calcularResumoCarrinho();
     const subtotal = resumo.subtotal;
     if (!Number.isFinite(subtotal) || subtotal <= 0 || !Number.isFinite(resumo.total)) return alert('Total da venda inválido.');
+
+    try { await window.prepararComprovanteAntesFinalizar?.(); } catch (e) { return alert(e.message || 'Não foi possível preparar o comprovante online.'); }
 
     const vendasAntes = JSON.stringify(historicoVendas);
 
@@ -272,6 +277,8 @@ document.getElementById('btn-finalizar').addEventListener('click', () => {
         historicoVendas = JSON.parse(vendasAntes);
         return alert('Venda não registrada: falha ao salvar os dados. O carrinho foi mantido. Verifique o armazenamento e tente novamente.');
     }
+
+    try { await window.finalizarComprovanteAoVivo?.(); } catch (e) { console.warn('Não foi possível encerrar o comprovante online:', e); }
 
     if (typeof window.printarCupom === 'function') {
         window.printarCupom(venda.cupomTexto);
