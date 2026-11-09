@@ -137,10 +137,23 @@
     sair.type = 'button';
     sair.textContent = 'Sair';
     sair.addEventListener('click', async () => {
+      if (sair.disabled) return;
       sair.disabled = true;
-      const { error } = await cliente.auth.signOut();
-      if (error) { alert('Não foi possível sair. Tente novamente.'); sair.disabled = false; }
-      else location.reload();
+      sair.textContent = 'Saindo...';
+      try {
+        // Encerra a sessão somente neste navegador/dispositivo e limpa o estado local.
+        const { error } = await cliente.auth.signOut({ scope: 'local' });
+        if (error) throw error;
+        window.pdvAuth = null;
+        faixa.remove();
+        // Recarrega a página protegida: sem sessão, o formulário de login será exibido.
+        location.replace(location.pathname + location.search);
+      } catch (error) {
+        console.error('Falha ao encerrar sessão do PDV:', error);
+        alert('Não foi possível encerrar a sessão. Verifique a conexão e tente novamente.');
+        sair.disabled = false;
+        sair.textContent = 'Sair';
+      }
     });
     faixa.append(nome, sair);
     document.body.appendChild(faixa);
