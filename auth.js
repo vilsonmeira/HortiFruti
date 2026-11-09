@@ -114,9 +114,10 @@
     window.pdvAuth = { user, papel, supabase: cliente };
   }
   async function validarAcesso(user) {
-    const { data, error } = await cliente.from('perfis').select('papel').eq('id', user.id).maybeSingle();
+    const { data, error } = await cliente.from('perfis').select('papel,ativo').eq('id', user.id).maybeSingle();
     if (error) throw new Error('Não foi possível consultar seu perfil: ' + error.message);
     if (!data || !['gerente','operador'].includes(data.papel)) throw new Error('Seu usuário não possui um perfil válido. Peça ao gerente para cadastrá-lo.');
+    if (data.ativo !== true) throw new Error('Este usuário está inativo. Peça ao gerente para reativar o acesso.');
     if (exigeGerente && data.papel !== 'gerente') {
       location.replace('index.html');
       return false;
