@@ -10,6 +10,10 @@
       return false;
     }
     const documento = janela.document;
+    janela.addEventListener('load', function () {
+      janela.focus();
+      janela.print();
+    }, { once: true });
     documento.open();
     documento.write('<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8">' +
       '<meta name="viewport" content="width=device-width,initial-scale=1">' +
@@ -26,10 +30,6 @@
     documento.close();
     documento.querySelector('pre').textContent = String(texto || '').trim();
     janela.focus();
-    janela.onload = function () {
-      janela.focus();
-      janela.print();
-    };
     return true;
   };
 })();
