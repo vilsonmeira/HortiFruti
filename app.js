@@ -47,6 +47,7 @@ let carrinho = [];
 let formaPagamento = null;
 let produtoParaPesar = null;
 window.obterCarrinhoPDV = () => carrinho;
+window.resumoCarrinhoPDV = () => calcularResumoCarrinho();
 
 // ===== SALVAR =====
 function salvarTudo() {
