@@ -44,7 +44,6 @@
   function bloquear(msg) {
     tela.style.display = 'flex';
     mostrarErro(msg || 'Acesso não autorizado. Confira seu cadastro com o gerente.');
-    document.getElementById('pdv-auth-form').style.display = 'none';
   }
   function liberar(user, papel) {
     tela.remove();
