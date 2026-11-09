@@ -208,6 +208,15 @@
                     <div class="grupo-form"><label>Estoque Inicial</label><input type="number" step="0.001" id="prod-est" value="0" min="0"></div>
                     <div class="grupo-form"><label>Estoque Mínimo</label><input type="number" step="0.001" id="prod-min" value="5" min="0"></div>
                     <div class="grupo-form" style="grid-column:1/-1;background:#f1f8e9;padding:12px;border-radius:8px;">
+                      <strong>🥗 Recomendações no PDV</strong>
+                      <small style="display:block;color:#526452;margin:5px 0 10px;">Marque as características para o sistema sugerir produtos relacionados. Confira sempre o rótulo e a informação nutricional.</small>
+                      <div class="grade-form" style="margin:0;">
+                        <div class="grupo-form"><label>Classe de vitamina</label><select id="prod-vitamina"><option value="">Não classificado</option><option value="A">Vitamina A</option><option value="B">Complexo B</option><option value="C">Vitamina C</option><option value="D">Vitamina D</option><option value="E">Vitamina E</option><option value="K">Vitamina K</option><option value="folato">Folato (B9)</option></select></div>
+                        <div class="grupo-form" style="display:flex;align-items:center;gap:9px;padding-top:22px;"><input type="checkbox" id="prod-diabetes" style="width:auto;"><label for="prod-diabetes" style="margin:0;">Exibir como opção para pessoas com diabetes*</label></div>
+                      </div>
+                      <small style="display:block;color:#526452;">*Marque somente após conferir a composição e a informação nutricional. Não representa recomendação médica.</small>
+                    </div>
+                    <div class="grupo-form" style="grid-column:1/-1;background:#f1f8e9;padding:12px;border-radius:8px;">
                       <strong>🏷️ Desconto por quantidade</strong>
                       <small style="display:block;color:#526452;margin:5px 0 10px;">Deixe a quantidade mínima em zero para não oferecer desconto.</small>
                       <div class="grade-form" style="margin:0;">
@@ -432,9 +441,9 @@
         }
         document.getElementById('busca-prod').oninput = e => carregarProd(e.target.value);
 
-        function abrirModalProd() { document.getElementById('tit-prod').textContent = 'Novo Produto'; document.getElementById('prod-id').value = ''; document.getElementById('form-prod').reset(); document.getElementById('prod-qtd-promo').value = 0; document.getElementById('prod-desc-promo').value = 0; document.getElementById('modal-prod').classList.add('aberto'); }
+        function abrirModalProd() { document.getElementById('tit-prod').textContent = 'Novo Produto'; document.getElementById('prod-id').value = ''; document.getElementById('form-prod').reset(); document.getElementById('prod-qtd-promo').value = 0; document.getElementById('prod-desc-promo').value = 0; document.getElementById('prod-vitamina').value = ''; document.getElementById('prod-diabetes').checked = false; document.getElementById('modal-prod').classList.add('aberto'); }
         function fecharModalProd() { document.getElementById('modal-prod').classList.remove('aberto'); }
-        function editarProd(id) { const p = produtos.find(x => Number(x.id) === Number(id)); if (!p) return; document.getElementById('tit-prod').textContent = 'Editar Produto'; document.getElementById('prod-id').value = p.id; document.getElementById('prod-cod').value = p.codigo; document.getElementById('prod-nome').value = p.nome; document.getElementById('prod-emoji').value = p.emoji; document.getElementById('prod-cat').value = p.categoria; document.getElementById('prod-preco').value = p.preco; document.getElementById('prod-und').value = p.unidade; document.getElementById('prod-est').value = p.estoque; document.getElementById('prod-min').value = p.minimo; document.getElementById('prod-qtd-promo').value = Number(p.quantidadeMinimaDesconto)||0; document.getElementById('prod-desc-promo').value = Number(p.descontoPercentual)||0; document.getElementById('modal-prod').classList.add('aberto'); }
+        function editarProd(id) { const p = produtos.find(x => Number(x.id) === Number(id)); if (!p) return; document.getElementById('tit-prod').textContent = 'Editar Produto'; document.getElementById('prod-id').value = p.id; document.getElementById('prod-cod').value = p.codigo; document.getElementById('prod-nome').value = p.nome; document.getElementById('prod-emoji').value = p.emoji; document.getElementById('prod-cat').value = p.categoria; document.getElementById('prod-preco').value = p.preco; document.getElementById('prod-und').value = p.unidade; document.getElementById('prod-est').value = p.estoque; document.getElementById('prod-min').value = p.minimo; document.getElementById('prod-qtd-promo').value = Number(p.quantidadeMinimaDesconto)||0; document.getElementById('prod-desc-promo').value = Number(p.descontoPercentual)||0; document.getElementById('prod-vitamina').value = p.vitaminaClasse || ''; document.getElementById('prod-diabetes').checked = Boolean(p.opcaoDiabetes); document.getElementById('modal-prod').classList.add('aberto'); }
         function excluirProd(id) { if (confirm('Excluir produto?')) { produtos = produtos.filter(p => Number(p.id) !== Number(id)); if (!salvarTudo()) { produtos = carregarDados('produtos', produtosPadrao); return; } carregarProd(); }}
         document.getElementById('form-prod').onsubmit = e => {
             e.preventDefault();
@@ -449,7 +458,9 @@
                 estoque: parseFloat(document.getElementById('prod-est').value || 0),
                 minimo: parseFloat(document.getElementById('prod-min').value || 5),
                 quantidadeMinimaDesconto: parseFloat(document.getElementById('prod-qtd-promo').value || 0),
-                descontoPercentual: parseFloat(document.getElementById('prod-desc-promo').value || 0)
+                descontoPercentual: parseFloat(document.getElementById('prod-desc-promo').value || 0),
+                vitaminaClasse: document.getElementById('prod-vitamina').value,
+                opcaoDiabetes: document.getElementById('prod-diabetes').checked
             };
             if (!dados.nome.trim()) return alert('O nome do produto é obrigatório!');
             if (!Number.isFinite(dados.preco) || dados.preco <= 0) return alert('Preço deve ser maior que zero!');
