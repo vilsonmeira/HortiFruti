@@ -19,7 +19,7 @@ window.finalizarComprovanteAoVivo=async()=>{if(tokenAtivo){await enviarSnapshot(
 window.cancelarComprovanteAoVivo=async()=>{if(tokenAtivo){try{await enviarSnapshot('cancelada');}catch(e){console.warn(e);}tokenAtivo=null;}};
 document.addEventListener('DOMContentLoaded',()=>{
  el('btn-cliente-buscar')?.addEventListener('click',buscar);el('btn-cliente-salvar')?.addEventListener('click',salvar);
- el('cliente-cpf')?.addEventListener('input',()=>{clienteSelecionado=null;el('cliente-selecionado').style.display='none';});
+ el('cliente-cpf')?.addEventListener('input',()=>{if(tokenAtivo)window.cancelarComprovanteAoVivo?.();clienteSelecionado=null;el('cliente-selecionado').style.display='none';status('CPF alterado. Faça uma nova consulta antes de continuar.');});
  el('btn-fechar-recibo')?.addEventListener('click',()=>el('modal-recibo-online').style.display='none');
 });
 document.addEventListener('pdv-auth-ready',()=>{});
