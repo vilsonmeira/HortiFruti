@@ -147,10 +147,26 @@ document.getElementById('btn-aplicar-peso').addEventListener('click', () => {
 });
 
 // ===== ATUALIZAR CARRINHO =====
+function calcularResumoCarrinho() {
+    const subtotal = carrinho.reduce((s,i) => s + (Number(i.preco) * Number(i.quantidade)), 0);
+    const quantidades = new Map();
+    carrinho.forEach(item => quantidades.set(String(item.produtoId), (quantidades.get(String(item.produtoId)) || 0) + Number(item.quantidade)));
+    let desconto = 0;
+    const descontosPorItem = carrinho.map(item => {
+        const produto = produtos.find(p => String(p.id) === String(item.produtoId));
+        const limite = Number(produto?.quantidadeMinimaDesconto) || 0;
+        const percentual = Number(produto?.descontoPercentual) || 0;
+        const atingiu = limite > 0 && percentual > 0 && (quantidades.get(String(item.produtoId)) || 0) >= limite;
+        const valor = atingiu ? Number(item.preco) * Number(item.quantidade) * percentual / 100 : 0;
+        desconto += valor;
+        return valor;
+    });
+    return {subtotal, desconto, total: Math.max(0, subtotal - desconto), descontosPorItem, quantidades};
+}
+
 function atualizarCarrinho() {
     const lista = document.getElementById('lista-itens');
     document.getElementById('qtd-itens').textContent = `(${carrinho.length})`;
-
     if(carrinho.length === 0) {
         lista.innerHTML = '<p class="vazio">Nenhum produto adicionado</p>';
         document.getElementById('subtotal').textContent = 'R$ 0,00';
@@ -159,31 +175,27 @@ function atualizarCarrinho() {
         formaPagamento = null;
         return;
     }
-
-    lista.innerHTML = carrinho.map(item => `
-        <div class="item-carrinho">
-            <div>
-                <span>${escapeHTML(item.emoji)}</span>
-                <div>
-                    <div>${escapeHTML(item.nome)}</div>
-                    <div style="font-size:0.8rem;color:#666;">${item.quantidade.toFixed(3)} ${escapeHTML(item.unidade)} × R$ ${item.preco.toFixed(2)}</div>
-                </div>
-            </div>
-            <div style="text-align:right;">
-                <div style="font-weight:bold;">R$ ${(item.preco * item.quantidade).toFixed(2)}</div>
-                <button type="button" class="remover-item" data-id="${Number(item.id)}" aria-label="Remover ${escapeHTML(item.nome)}" style="background:none;border:none;color:red;cursor:pointer;padding:2px;">✕</button>
-            </div>
-        </div>
-    `).join('');
-
-    lista.querySelectorAll('.remover-item').forEach(btn => {
-        btn.addEventListener('click', () => removerItem(Number(btn.dataset.id)));
-    });
-
-    const subtotal = carrinho.reduce((s,i) => s + (i.preco * i.quantidade), 0);
-    document.getElementById('subtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
-    document.getElementById('desconto-valor').textContent = 'R$ 0,00';
-    document.getElementById('total').textContent = `R$ ${subtotal.toFixed(2)}`;
+    const resumo = calcularResumoCarrinho();
+    lista.innerHTML = carrinho.map((item, index) => {
+        const bruto = Number(item.preco) * Number(item.quantidade);
+        const desc = resumo.descontosPorItem[index];
+        const liquido = bruto - desc;
+        return `<div class="item-carrinho">
+          <div><span>${escapeHTML(item.emoji)}</span><div>
+            <div>${escapeHTML(item.nome)}</div>
+            <div style="font-size:0.8rem;color:#666;">${Number(item.quantidade).toFixed(3)} ${escapeHTML(item.unidade)} × R$ ${Number(item.preco).toFixed(2)}</div>
+            ${desc > 0 ? `<div style="font-size:0.78rem;color:#2e7d32;">Desconto por quantidade: -R$ ${desc.toFixed(2)}</div>` : ''}
+          </div></div>
+          <div style="text-align:right;"><div style="font-weight:bold;">R$ ${liquido.toFixed(2)}</div>
+            ${desc > 0 ? `<small style="color:#777;text-decoration:line-through;">R$ ${bruto.toFixed(2)}</small>` : ''}
+            <button type="button" class="remover-item" data-id="${Number(item.id)}" aria-label="Remover ${escapeHTML(item.nome)}" style="background:none;border:none;color:red;cursor:pointer;padding:2px;">✕</button>
+          </div>
+        </div>`;
+    }).join('');
+    lista.querySelectorAll('.remover-item').forEach(btn => btn.addEventListener('click', () => removerItem(Number(btn.dataset.id))));
+    document.getElementById('subtotal').textContent = `R$ ${resumo.subtotal.toFixed(2)}`;
+    document.getElementById('desconto-valor').textContent = `-R$ ${resumo.desconto.toFixed(2)}`;
+    document.getElementById('total').textContent = `R$ ${resumo.total.toFixed(2)}`;
 }
 
 function removerItem(id) {
@@ -216,20 +228,21 @@ document.getElementById('btn-finalizar').addEventListener('click', () => {
         }
     }
 
-    const subtotal = carrinho.reduce((s, i) => s + (Number(i.preco) * Number(i.quantidade)), 0);
-    if (!Number.isFinite(subtotal) || subtotal <= 0) return alert('Total da venda inválido.');
+    const resumo = calcularResumoCarrinho();
+    const subtotal = resumo.subtotal;
+    if (!Number.isFinite(subtotal) || subtotal <= 0 || !Number.isFinite(resumo.total)) return alert('Total da venda inválido.');
 
     const vendasAntes = JSON.stringify(historicoVendas);
 
     const venda = {
         id: Date.now(),
         data: new Date().toISOString(),
-        itens: carrinho.map(item => ({ ...item })),
+        itens: carrinho.map((item, index) => ({ ...item, descontoValor: resumo.descontosPorItem[index] })),
         subtotal,
-        desconto: 0,
-        total: subtotal,
+        desconto: resumo.desconto,
+        total: resumo.total,
         formaPagamento,
-        cupomTexto: gerarCupom(subtotal)
+        cupomTexto: gerarCupom(resumo.total, resumo)
     };
     historicoVendas.push(venda);
 
@@ -250,7 +263,7 @@ document.getElementById('btn-finalizar').addEventListener('click', () => {
     renderProdutos();
 });
 // ===== GERAR CUPOM =====
-function gerarCupom(total) {
+function gerarCupom(total, resumo = calcularResumoCarrinho()) {
     const data = new Date().toLocaleString('pt-BR');
     return `
 ${cfg.nome.toUpperCase()}
@@ -261,12 +274,16 @@ DATA: ${data}
 VENDA Nº: ${historicoVendas.length + 1}
 --------------------------------
 ITENS:
-${carrinho.map(i => `${i.emoji} ${i.nome}
-  ${i.quantidade.toFixed(3)} ${i.unidade} x ${i.preco.toFixed(2)}
-  R$ ${(i.preco*i.quantidade).toFixed(2)}`).join('\n')}
+${carrinho.map((i,index) => {
+  const bruto = Number(i.preco) * Number(i.quantidade);
+  const desc = resumo.descontosPorItem[index] || 0;
+  return `${i.emoji} ${i.nome}
+  ${i.quantidade.toFixed(3)} ${i.unidade} x ${Number(i.preco).toFixed(2)}
+  ${desc > 0 ? 'Desconto: -R$ ' + desc.toFixed(2) + '\\n  ' : ''}R$ ${(bruto-desc).toFixed(2)}`;
+}).join('\n')}
 --------------------------------
-SUBTOTAL.......: R$ ${total.toFixed(2)}
-DESCONTO.......: R$ 0,00
+SUBTOTAL.......: R$ ${resumo.subtotal.toFixed(2)}
+DESCONTO.......: R$ ${resumo.desconto.toFixed(2)}
 TOTAL..........: R$ ${total.toFixed(2)}
 --------------------------------
 PAGAMENTO: ${formaPagamento.toUpperCase()}
@@ -274,7 +291,6 @@ PAGAMENTO: ${formaPagamento.toUpperCase()}
 OBRIGADO! VOLTE SEMPRE!
     `.trim();
 }
-
 // ===== CANCELAR =====
 document.getElementById('btn-cancelar').addEventListener('click', () => {
     if(carrinho.length > 0 && !confirm('Limpar carrinho?')) return;
