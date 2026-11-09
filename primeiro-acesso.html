@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#2e7d32">
+<title>Primeiro acesso — HortiFruti PDV</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.setup-card{max-width:460px;margin:5vh auto;background:#fff;padding:28px;border-radius:16px;box-shadow:0 12px 38px #163b1d20}
+.setup-card label{display:block;font-weight:700;margin:16px 0 6px}
+.setup-card input{box-sizing:border-box;width:100%;padding:13px;border:1px solid #cbd8cc;border-radius:8px;font-size:16px}
+.setup-card button{width:100%;padding:14px;margin-top:20px;border:0;border-radius:8px;background:#2e7d32;color:white;font-size:16px;font-weight:700}
+#setup-msg{min-height:24px}
+</style>
+</head>
+<body>
+<main class="setup-card">
+<h1>🍉 Configurar primeiro gerente</h1>
+<p>Crie a conta principal do HortiFruti PDV. Este cadastro só poderá ser concluído uma vez, enquanto o sistema ainda não tiver usuários.</p>
+<form id="pdv-first-setup">
+<label for="setup-name">Nome completo</label>
+<input id="setup-name" value="Vilson Souza Meira" maxlength="100" autocomplete="name" required>
+<label for="setup-cpf">CPF</label>
+<input id="setup-cpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="Digite seu CPF" required>
+<label for="setup-password">Criar senha</label>
+<input id="setup-password" type="password" minlength="10" maxlength="72" autocomplete="new-password" required>
+<label for="setup-confirm">Confirmar senha</label>
+<input id="setup-confirm" type="password" minlength="10" maxlength="72" autocomplete="new-password" required>
+<p>Use uma senha forte e exclusiva. Não compartilhe CPF ou senha por mensagem.</p>
+<div id="setup-msg" role="status" aria-live="polite"></div>
+<button id="setup-submit" type="submit">Criar gerente master</button>
+</form>
+<p><a href="index.html">Voltar ao login</a></p>
+</main>
+<script src="primeiro-acesso.js"></script>
+</body>
+</html>
