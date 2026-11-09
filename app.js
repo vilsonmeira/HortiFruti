@@ -204,24 +204,38 @@ function atualizarCarrinho() {
     window.atualizarComprovanteAoVivo?.();
 }
 
-function atualizarSugestoes() {
-    const painel = document.getElementById('painel-sugestoes');
-    if (!painel) return;
+function obterSugestoesAtuais() {
     const idsNoCarrinho = new Set(carrinho.map(item => String(item.produtoId)));
     const classes = new Set(carrinho.map(item => produtos.find(p => String(p.id) === String(item.produtoId))?.vitaminaClasse).filter(Boolean));
     const buscaDiabetes = carrinho.some(item => Boolean(produtos.find(p => String(p.id) === String(item.produtoId))?.opcaoDiabetes));
-    const recomendacoes = produtos.map(produto => {
-        if (idsNoCarrinho.has(String(produto.id))) return null;
+    return produtos.map(produto => {
+        if (idsNoCarrinho.has(String(produto.id)) || Number(produto.preco) < 0) return null;
         const motivos = [];
         if (produto.vitaminaClasse && classes.has(produto.vitaminaClasse)) motivos.push('Mesma classe: vitamina ' + (produto.vitaminaClasse === 'folato' ? 'B9 (folato)' : produto.vitaminaClasse));
-        if (buscaDiabetes && produto.opcaoDiabetes) motivos.push('Opção cadastrada para pessoas com diabetes');
+        if (buscaDiabetes && produto.opcaoDiabetes) motivos.push('Opção cadastrada na categoria de produtos para pessoas com diabetes');
         return motivos.length ? {produto, motivo: motivos.join(' • ')} : null;
-    }).filter(Boolean).slice(0, 4);
+    }).filter(Boolean).slice(0, 4).map(({produto, motivo}) => ({
+        nome: String(produto.nome || '').slice(0, 100),
+        emoji: String(produto.emoji || '🥬').slice(0, 8),
+        preco: Number(produto.preco) || 0,
+        unidade: String(produto.unidade || 'un').slice(0, 10),
+        motivo: String(motivo).slice(0, 180)
+    }));
+}
+window.obterSugestoesPDV = obterSugestoesAtuais;
+
+function atualizarSugestoes() {
+    const painel = document.getElementById('painel-sugestoes');
+    if (!painel) return;
+    const recomendacoes = obterSugestoesAtuais();
     if (!carrinho.length || !recomendacoes.length) { painel.hidden = true; painel.innerHTML = ''; return; }
     painel.hidden = false;
     painel.innerHTML = '<h4>💡 Sugestões para oferecer</h4><p class="sugestoes-aviso">Sugestões baseadas nas classificações cadastradas. Confira rótulos e necessidades individuais.</p>' +
-      recomendacoes.map(({produto, motivo}) => `<div class="sugestao-produto"><div><strong>${escapeHTML(produto.emoji)} ${escapeHTML(produto.nome)}</strong><small>${escapeHTML(motivo)}</small><span>R$ ${Number(produto.preco).toFixed(2)} / ${escapeHTML(produto.unidade)}</span></div><button type="button" class="btn-sugestao" data-produto-id="${Number(produto.id)}">Adicionar</button></div>`).join('');
-    painel.querySelectorAll('.btn-sugestao').forEach(btn => btn.addEventListener('click', () => adicionarAoCarrinho(Number(btn.dataset.produtoId))));
+      recomendacoes.map(s => `<div class="sugestao-produto"><div><strong>${escapeHTML(s.emoji)} ${escapeHTML(s.nome)}</strong><small>${escapeHTML(s.motivo)}</small><span>R$ ${s.preco.toFixed(2)} / ${escapeHTML(s.unidade)}</span></div><button type="button" class="btn-sugestao" data-produto-nome="${escapeHTML(s.nome)}">Adicionar pelo caixa</button></div>`).join('');
+    painel.querySelectorAll('.btn-sugestao').forEach(btn => btn.addEventListener('click', () => {
+        const p = produtos.find(x => x.nome === btn.dataset.produtoNome);
+        if (p) adicionarAoCarrinho(Number(p.id));
+    }));
 }
 
 function removerItem(id) {
