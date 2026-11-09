@@ -37,13 +37,9 @@ function mesmaData(d1, d2) {
 }
 
 // ===== DADOS INICIAIS =====
-const produtosPadrao = [
-    {id:1,codigo:"001",nome:"Maçã Fuji",preco:8.99,unidade:"kg",categoria:"frutas",emoji:"🍎",estoque:50,minimo:10},
-    {id:2,codigo:"002",nome:"Banana Prata",preco:4.99,unidade:"kg",categoria:"frutas",emoji:"🍌",estoque:30,minimo:8},
-    {id:3,codigo:"003",nome:"Laranja Pera",preco:6.50,unidade:"kg",categoria:"frutas",emoji:"🍊",estoque:40,minimo:10}
-];
-
-let produtos = carregarDados('produtos', produtosPadrao);
+const produtosPadrao = window.CATALOGO_PRODUTOS || [];
+let produtos = window.mesclarCatalogoProdutos(carregarDados('produtos', produtosPadrao));
+salvarDados('produtos', produtos);
 let historicoVendas = carregarDados('historicoVendas', []);
 let cfg = carregarDados('configuracoes', {nome:'Hortifruti',cnpj:'',tel:'',cidade:''});
 
@@ -107,6 +103,7 @@ function renderProdutos(filtro='', categoria='todos') {
 function adicionarAoCarrinho(id) {
     const produto = produtos.find(p => Number(p.id) === Number(id));
     if(!produto) return alert('Produto não encontrado!');
+    if (!Number.isFinite(Number(produto.preco)) || Number(produto.preco) <= 0) return alert('Defina o preço deste produto na Gestão antes de vender.');
 
     if(produto.unidade === 'kg') {
         produtoParaPesar = produto;
