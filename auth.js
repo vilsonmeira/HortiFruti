@@ -14,7 +14,6 @@
     #pdv-auth-card label{display:block;font-weight:600;margin:14px 0 6px}
     #pdv-auth-card input{box-sizing:border-box;width:100%;padding:12px;border:1px solid #ccd5cc;border-radius:8px;font-size:16px}
     #pdv-auth-card button{width:100%;padding:12px;margin-top:16px;border:0;border-radius:8px;background:#2e7d32;color:#fff;font-weight:700;font-size:16px;cursor:pointer}
-    #pdv-auth-forgot{display:block;width:100%;margin-top:12px;padding:8px;border:0;background:transparent;color:#246b2b;text-decoration:underline;cursor:pointer;font-size:14px}
     #pdv-auth-error{color:#b3261e;min-height:20px;font-size:14px}
     #pdv-auth-user{position:fixed;right:12px;top:12px;z-index:9998;background:#fff;padding:7px 10px;border-radius:8px;box-shadow:0 2px 8px #0002;font:12px Arial;display:flex;gap:8px;align-items:center}
     #pdv-auth-user button,#pdv-auth-user a{border:0;background:#e8f5e9;color:#205c25;border-radius:6px;padding:6px 9px;cursor:pointer;text-decoration:none}
@@ -155,10 +154,8 @@
     if (codigoErro || parametrosRetorno.get('error')) {
       const expirado = codigoErro === 'otp_expired' || (descricaoErro || '').toLowerCase().includes('expired');
       mostrarErro(expirado
-        ? 'Este link de recuperação expirou ou já foi utilizado. Digite seu e-mail e clique em “Enviar novo link de recuperação”.'
-        : 'Não foi possível validar o link de recuperação. Digite seu e-mail e solicite um novo link.');
-      const botaoRecuperar = document.getElementById('pdv-auth-forgot');
-      if (botaoRecuperar) botaoRecuperar.textContent = 'Enviar novo link de recuperação';
+        ? 'Este link de recuperação não é mais utilizado no acesso por CPF. Entre com seu CPF e senha.'
+        : 'Não foi possível validar este link. Entre com seu CPF e senha.');
       history.replaceState(null, document.title, location.pathname + location.search);
     }
     if (data.session) {
