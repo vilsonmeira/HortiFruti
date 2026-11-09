@@ -5,7 +5,7 @@
   const SUPABASE_URL = 'https://vcyneajmmwvvnefqompe.supabase.co';
   const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_fOe9mU2A_48YLPKq1NB6ZQ_Hg_GZaym';
   const pagina = location.pathname.split('/').pop() || 'index.html';
-  const exigeGerente = ['usuarios.html', 'admin-senhas.html'].includes(pagina);
+  const exigeGerente = ['master.html', 'usuarios.html', 'admin-senhas.html'].includes(pagina);
   const permissoesGestao = ['produtos','estoque','fechamento','relatorios','configuracoes'];
   const nomesPapeis = {gerente:'Gerente Master',operador:'Operador',vendedor:'Vendedor',financeiro:'Financeiro',estoquista:'Estoquista'};
   let cliente;
@@ -124,6 +124,10 @@
     const nome = document.createElement('span');
     nome.textContent = (nomePerfil || user.user_metadata?.nome || 'Usuário') + ' · ' + (nomesPapeis[papel] || 'Operador');
     if (papel === 'gerente') {
+      const master = document.createElement('a');
+      master.href = 'master.html';
+      master.textContent = 'Painel Master';
+      faixa.appendChild(master);
       const senhas = document.createElement('a');
       senhas.href = 'admin-senhas.html';
       senhas.textContent = 'Senhas';
@@ -138,9 +142,6 @@
       if (error) { alert('Não foi possível sair. Tente novamente.'); sair.disabled = false; }
       else location.reload();
     });
-    if (papel === 'gerente' && pagina === 'gestao.html') {
-      const usuarios = document.createElement('a'); usuarios.href = 'usuarios.html'; usuarios.textContent = 'Usuários'; faixa.appendChild(usuarios);
-    }
     faixa.append(nome, sair);
     document.body.appendChild(faixa);
     window.pdvAuth = { user, papel, permissoes: papel === 'gerente' ? Object.fromEntries(['vendas','produtos','estoque','fechamento','relatorios','configuracoes','usuarios'].map(k => [k,true])) : permissoes, supabase: cliente };
