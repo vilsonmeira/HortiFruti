@@ -173,6 +173,7 @@ function atualizarCarrinho() {
         document.getElementById('desconto-valor').textContent = 'R$ 0,00';
         document.getElementById('total').textContent = 'R$ 0,00';
         formaPagamento = null;
+        atualizarSugestoes();
         return;
     }
     const resumo = calcularResumoCarrinho();
@@ -196,6 +197,27 @@ function atualizarCarrinho() {
     document.getElementById('subtotal').textContent = `R$ ${resumo.subtotal.toFixed(2)}`;
     document.getElementById('desconto-valor').textContent = `-R$ ${resumo.desconto.toFixed(2)}`;
     document.getElementById('total').textContent = `R$ ${resumo.total.toFixed(2)}`;
+    atualizarSugestoes();
+}
+
+function atualizarSugestoes() {
+    const painel = document.getElementById('painel-sugestoes');
+    if (!painel) return;
+    const idsNoCarrinho = new Set(carrinho.map(item => String(item.produtoId)));
+    const classes = new Set(carrinho.map(item => produtos.find(p => String(p.id) === String(item.produtoId))?.vitaminaClasse).filter(Boolean));
+    const buscaDiabetes = carrinho.some(item => Boolean(produtos.find(p => String(p.id) === String(item.produtoId))?.opcaoDiabetes));
+    const recomendacoes = produtos.map(produto => {
+        if (idsNoCarrinho.has(String(produto.id))) return null;
+        const motivos = [];
+        if (produto.vitaminaClasse && classes.has(produto.vitaminaClasse)) motivos.push('Mesma classe: vitamina ' + (produto.vitaminaClasse === 'folato' ? 'B9 (folato)' : produto.vitaminaClasse));
+        if (buscaDiabetes && produto.opcaoDiabetes) motivos.push('Opção cadastrada para pessoas com diabetes');
+        return motivos.length ? {produto, motivo: motivos.join(' • ')} : null;
+    }).filter(Boolean).slice(0, 4);
+    if (!carrinho.length || !recomendacoes.length) { painel.hidden = true; painel.innerHTML = ''; return; }
+    painel.hidden = false;
+    painel.innerHTML = '<h4>💡 Sugestões para oferecer</h4><p class="sugestoes-aviso">Sugestões baseadas nas classificações cadastradas. Confira rótulos e necessidades individuais.</p>' +
+      recomendacoes.map(({produto, motivo}) => `<div class="sugestao-produto"><div><strong>${escapeHTML(produto.emoji)} ${escapeHTML(produto.nome)}</strong><small>${escapeHTML(motivo)}</small><span>R$ ${Number(produto.preco).toFixed(2)} / ${escapeHTML(produto.unidade)}</span></div><button type="button" class="btn-sugestao" data-produto-id="${Number(produto.id)}">Adicionar</button></div>`).join('');
+    painel.querySelectorAll('.btn-sugestao').forEach(btn => btn.addEventListener('click', () => adicionarAoCarrinho(Number(btn.dataset.produtoId))));
 }
 
 function removerItem(id) {
