@@ -143,6 +143,9 @@
     faixa.append(nome, sair);
     document.body.appendChild(faixa);
     window.pdvAuth = { user, papel, permissoes: papel === 'gerente' ? Object.fromEntries(['vendas','produtos','estoque','fechamento','relatorios','configuracoes','usuarios'].map(k => [k,true])) : permissoes, supabase: cliente };
+    document.querySelectorAll('a[href="usuarios.html"]').forEach(link => { if (papel !== 'gerente') link.style.display = 'none'; });
+    document.querySelectorAll('a[href="index.html"]').forEach(link => { if (papel !== 'gerente' && permissoes.vendas !== true) link.style.display = 'none'; });
+    document.querySelectorAll('a[href="vendas.html"]').forEach(link => { if (papel !== 'gerente' && permissoes.relatorios !== true) link.style.display = 'none'; });
     if (pagina === 'gestao.html' && papel !== 'gerente') {
       document.querySelectorAll('.aba-btn[data-aba]').forEach(btn => {
         const aba = btn.dataset.aba;
