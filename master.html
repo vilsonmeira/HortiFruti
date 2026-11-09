@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#173d25"><title>Painel Master | HortiFruti PDV</title>
+<link rel="stylesheet" href="style.css">
+<style>
+:root{color-scheme:light}body{margin:0;background:#f3f7f2;color:#203326;font-family:Arial,sans-serif}.master-wrap{max-width:1180px;margin:0 auto;padding:28px 18px 50px}.hero{background:linear-gradient(125deg,#12351f,#2e7d32);color:#fff;border-radius:20px;padding:28px;box-shadow:0 12px 30px #153d2025}.hero h1{margin:0 0 8px;font-size:clamp(25px,4vw,36px)}.hero p{margin:0;color:#e3f2e4;line-height:1.5}.tag{display:inline-block;background:#ffffff20;border:1px solid #ffffff40;border-radius:30px;padding:6px 11px;font-size:12px;font-weight:700;margin-bottom:15px}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:20px 0}.stat,.panel{background:#fff;border:1px solid #e1e9df;border-radius:15px;padding:20px;box-shadow:0 4px 14px #163b1b0b}.stat small{color:#657566;font-weight:700}.stat strong{display:block;font-size:32px;margin-top:8px;color:#205c28}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}.action{display:flex;flex-direction:column;gap:10px;min-height:150px}.action h2{font-size:19px;margin:0}.action p{margin:0;color:#627064;line-height:1.5;flex:1}.btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:0;border-radius:9px;padding:12px 15px;background:#2e7d32;color:white;font-weight:700;cursor:pointer}.btn.secondary{background:#e8f5e9;color:#205c28}.muted{color:#68776a;font-size:13px}.notice{margin-top:18px;background:#fff8e1;border-left:4px solid #e7a925;padding:14px;border-radius:9px;color:#62501e;line-height:1.5}#status{min-height:20px;color:#657566;font-size:13px;margin-top:10px}@media(max-width:600px){.master-wrap{padding:14px}.hero{padding:22px}.stat,.panel{padding:16px}}
+</style>
+</head>
+<body>
+<main class="master-wrap">
+<section class="hero">
+  <span class="tag">🔐 ÁREA RESTRITA · GERENTE MASTER</span>
+  <h1>Painel Master</h1>
+  <p>Central administrativa do HortiFruti PDV. Gerencie os acessos da equipe e acompanhe a situação dos usuários em uma página independente da tela de Gestão.</p>
+</section>
+<section class="stats" aria-label="Resumo dos usuários">
+  <article class="stat"><small>USUÁRIOS CADASTRADOS</small><strong id="total">—</strong><span class="muted">Contas com perfil no sistema</span></article>
+  <article class="stat"><small>ACESSOS ATIVOS</small><strong id="ativos">—</strong><span class="muted">Usuários liberados para entrar</span></article>
+  <article class="stat"><small>ACESSOS BLOQUEADOS</small><strong id="bloqueados">—</strong><span class="muted">Usuários temporariamente inativos</span></article>
+</section>
+<section class="grid">
+  <article class="panel action"><h2>👥 Gerenciar usuários</h2><p>Criar operadores, vendedores, financeiros e estoquistas; ajustar permissões e bloquear ou reativar acessos.</p><a class="btn" href="usuarios.html">Abrir gerenciamento de usuários</a></article>
+  <article class="panel action"><h2>⚙️ Gestão do sistema</h2><p>Acessar produtos, estoque, relatórios, fechamento e configurações conforme as funções disponíveis.</p><a class="btn secondary" href="gestao.html">Abrir Gestão</a></article>
+  <article class="panel action"><h2>🔑 Administração de senhas</h2><p>Acessar as ferramentas administrativas de senha disponíveis para o gerente.</p><a class="btn secondary" href="admin-senhas.html">Administrar senhas</a></article>
+  <article class="panel action"><h2>🛒 Ponto de venda</h2><p>Voltar à operação do caixa e à tela principal de vendas.</p><a class="btn secondary" href="index.html">Abrir PDV</a></article>
+</section>
+<div class="notice"><strong>Proteção do Master:</strong> esta página exige autenticação de uma conta com perfil <em>gerente</em>. O cadastro de funcionários não permite promover outro usuário a gerente nem alterar a própria conta Master.</div>
+<div id="status" role="status" aria-live="polite">Carregando resumo...</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js?v=20261109-master1"></script>
+<script>
+(() => {
+ const $=id=>document.getElementById(id);
+ async function carregar(){
+   const auth=window.pdvAuth;
+   if(!auth||auth.papel!=='gerente'||!auth.supabase){$('status').textContent='Aguardando validação do acesso Master...';return;}
+   try{
+     const {data,error}=await auth.supabase.functions.invoke('pdv-gerenciar-usuarios',{body:{action:'list'}});
+     if(error)throw new Error(data?.error||error.message);
+     if(data?.error)throw new Error(data.error);
+     const users=data.users||[];
+     $('total').textContent=users.length;
+     $('ativos').textContent=users.filter(u=>u.ativo===true).length;
+     $('bloqueados').textContent=users.filter(u=>u.ativo!==true).length;
+     $('status').textContent='Resumo atualizado com sucesso.';
+   }catch(e){$('status').textContent='Não foi possível carregar o resumo: '+(e.message||'erro desconhecido')+'. Use Gerenciar usuários para tentar novamente.';}
+ }
+ if(window.pdvAuth?.papel==='gerente')carregar();
+ else window.addEventListener('pdv-auth-ready',e=>{if(e.detail?.papel==='gerente')carregar();},{once:true});
+})();
+</script>
+</body></html>
