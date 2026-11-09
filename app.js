@@ -241,15 +241,10 @@ document.getElementById('btn-finalizar').addEventListener('click', () => {
         return alert('Venda não registrada: falha ao salvar os dados. O carrinho foi mantido. Verifique o armazenamento e tente novamente.');
     }
 
-    const janela = window.open('', '_blank', 'width=320,height=600');
-    if (janela) {
-        const pre = janela.document.createElement('pre');
-        pre.style.cssText = 'font-family:monospace;font-size:12px;white-space:pre-wrap;margin:0;';
-        pre.textContent = venda.cupomTexto;
-        janela.document.body.appendChild(pre);
-        janela.document.close();
+    if (typeof window.printarCupom === 'function') {
+        window.printarCupom(venda.cupomTexto);
     } else {
-        alert('Venda salva. O navegador bloqueou a janela de impressão; permita pop-ups para imprimir o cupom.');
+        alert('Venda salva, mas o módulo de impressão não carregou. Atualize a página e reimprima pelo histórico.');
     }
 
     carrinho = [];
