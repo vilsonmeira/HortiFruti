@@ -1,0 +1,28 @@
+(function(){
+'use strict';
+const URL='https://vcyneajmmwvvnefqompe.supabase.co/functions/v1/pdv-clientes-recibo';
+let clienteSelecionado=null,tokenAtivo=null,ultimaAtualizacao='',timer=null;
+const el=id=>document.getElementById(id);
+function status(msg,erro=false){const n=el('cliente-status');if(n){n.textContent=msg;n.style.color=erro?'#b3261e':'#375b35';}}
+function cpfValido(v){const c=String(v).replace(/\D/g,'');if(c.length!==11||/^(\d)\1{10}$/.test(c))return false;const d=(b,f)=>{let s=0;for(const x of b)s+=+x*f--;const r=s*10%11;return r===10?0:r;};return d(c.slice(0,9),10)===+c[9]&&d(c.slice(0,10),11)===+c[10];}
+function tokenNovo(){const b=new Uint8Array(32);crypto.getRandomValues(b);return [...b].map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function authReady(){if(window.pdvAuth?.supabase)return window.pdvAuth;return await new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(new Error('Aguarde o login do PDV e tente novamente.')),12000);window.addEventListener('pdv-auth-ready',e=>{clearTimeout(t);resolve(e.detail)},{once:true});});}
+async function api(action,data={}){const a=await authReady();const {data:s}=await a.supabase.auth.getSession();const res=await fetch(URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':a.supabase.supabaseKey,'Authorization':'Bearer '+(s.session?.access_token||'')},body:JSON.stringify({action,...data})});const j=await res.json();if(!res.ok)throw new Error(j.error||'Falha na operação.');return j;}
+function dadosVenda(){const itens=(window.carrinho||[]).map(i=>({nome:i.nome,quantidade:i.quantidade,unidade:i.unidade,preco:i.preco,total:Number(i.preco)*Number(i.quantidade)-(Number(i.descontoValor)||0)}));const sub=itens.reduce((s,i)=>s+i.preco*i.quantidade,0);const total=itens.reduce((s,i)=>s+i.total,0);return {itens,subtotal:sub,desconto:sub-total,total};}
+async function enviarSnapshot(statusVenda='em_andamento'){if(!tokenAtivo)return;const d=dadosVenda();const fingerprint=JSON.stringify([d,statusVenda]);if(fingerprint===ultimaAtualizacao&&statusVenda==='em_andamento')return;await api('receipt_update',{token:tokenAtivo,payload:d,status:statusVenda});ultimaAtualizacao=fingerprint;}
+async function buscar(){try{const cpf=el('cliente-cpf').value.replace(/\D/g,'');if(!cpfValido(cpf))throw new Error('Digite um CPF válido.');status('Consultando cadastro...');const r=await api('customer_search',{cpf});if(r.cliente){clienteSelecionado=r.cliente;el('cliente-nome').value=r.cliente.nome;el('cliente-telefone').value=r.cliente.telefone||'';el('cliente-selecionado').style.display='block';el('cliente-selecionado').textContent='Cliente selecionado: '+r.cliente.nome;status('Cliente localizado.');}else{clienteSelecionado=null;el('cliente-selecionado').style.display='none';status('CPF não cadastrado. Preencha o nome e clique em Cadastrar cliente.',true);}}catch(e){status(e.message,true);}}
+async function salvar(){try{const cpf=el('cliente-cpf').value.replace(/\D/g,'');const nome=el('cliente-nome').value.trim();if(!cpfValido(cpf)||nome.length<2)throw new Error('Informe um CPF válido e o nome do cliente.');status('Salvando cliente...');const r=await api('customer_save',{cpf,nome,telefone:el('cliente-telefone').value});clienteSelecionado=r.cliente;el('cliente-selecionado').style.display='block';el('cliente-selecionado').textContent='Cliente selecionado: '+r.cliente.nome;status('Cadastro salvo e cliente selecionado.');}catch(e){status(e.message,true);}}
+async function abrirRecibo(){if(!clienteSelecionado||!window.carrinho?.length||tokenAtivo)return;try{tokenAtivo=tokenNovo();const d=dadosVenda();await api('receipt_create',{token:tokenAtivo,cliente_id:clienteSelecionado.id,venda_id:String(Date.now()),payload:d});ultimaAtualizacao=JSON.stringify([d,'em_andamento']);const url=new URL('recibo-cliente.html',location.href);url.searchParams.set('t',tokenAtivo);el('qr-recibo-online').innerHTML='';if(window.QRCode)new QRCode(el('qr-recibo-online'),{text:url.href,width:220,height:220});el('url-recibo-online').textContent=url.href;el('modal-recibo-online').style.display='flex';}
+catch(e){tokenAtivo=null;status('Não foi possível abrir o comprovante: '+e.message,true);}}
+window.atualizarComprovanteAoVivo=()=>{if(!tokenAtivo)return;clearTimeout(timer);timer=setTimeout(()=>enviarSnapshot().catch(e=>console.warn('Recibo online:',e)),250);};
+window.finalizarComprovanteAoVivo=async()=>{if(tokenAtivo){await enviarSnapshot('concluida');tokenAtivo=null;}};
+window.cancelarComprovanteAoVivo=async()=>{if(tokenAtivo){try{await enviarSnapshot('cancelada');}catch(e){console.warn(e);}tokenAtivo=null;}};
+document.addEventListener('DOMContentLoaded',()=>{
+ el('btn-cliente-buscar')?.addEventListener('click',buscar);el('btn-cliente-salvar')?.addEventListener('click',salvar);
+ el('cliente-cpf')?.addEventListener('input',()=>{clienteSelecionado=null;el('cliente-selecionado').style.display='none';});
+ el('btn-fechar-recibo')?.addEventListener('click',()=>el('modal-recibo-online').style.display='none');
+});
+document.addEventListener('pdv-auth-ready',()=>{});
+document.getElementById('btn-finalizar')?.addEventListener('click',()=>{if(clienteSelecionado&&window.carrinho?.length&&!tokenAtivo)abrirRecibo();},true);
+document.getElementById('btn-cancelar')?.addEventListener('click',()=>{window.cancelarComprovanteAoVivo?.();});
+})();
