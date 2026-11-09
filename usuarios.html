@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#2e7d32"><title>Usuários e permissões | HortiFruti PDV</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body{background:#f4f7f2}.usuarios-wrap{max-width:1100px;margin:24px auto;padding:16px}.topo-usuarios{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.painel{background:#fff;border-radius:14px;padding:22px;margin:18px 0;box-shadow:0 3px 14px #173b1b12}.grid-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}.campo label{display:block;font-weight:700;margin-bottom:6px}.campo input{width:100%;box-sizing:border-box;padding:12px;border:1px solid #cbd5cb;border-radius:8px;font-size:16px}.btn{border:0;border-radius:8px;padding:11px 15px;font-weight:700;cursor:pointer}.primario{background:#2e7d32;color:white}.secundario{background:#e8f5e9;color:#205c28}.lista{display:grid;gap:14px}.usuario-card{border:1px solid #e0e8df;border-radius:12px;padding:17px}.usuario-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.nome{font-size:18px;font-weight:700}.meta{color:#607060;font-size:13px;margin-top:4px}.tag{font-size:12px;padding:5px 9px;border-radius:20px;background:#e8f5e9;color:#205c28;font-weight:700}.tag.off{background:#ffebee;color:#b3261e}.perms{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:16px 0}.perm{display:flex;align-items:center;gap:8px;padding:9px;background:#f7faf6;border-radius:8px}.acoes{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}.msg{min-height:22px;margin:10px 0;color:#27632d}.msg.erro{color:#b3261e}.vazio{text-align:center;color:#718071;padding:25px}.master-note{background:#fff8e1;border-left:4px solid #f9a825;padding:12px;border-radius:8px;color:#5d4b17}.cabecalho-link{color:#246b2b;text-decoration:none;font-weight:700}@media(max-width:600px){.painel{padding:15px}.usuarios-wrap{padding:10px}}
+</style>
+</head>
+<body>
+<main class="usuarios-wrap">
+  <div class="topo-usuarios">
+    <div><a class="cabecalho-link" href="gestao.html">← Voltar à Gestão</a><h1>👥 Usuários e permissões</h1><p>Crie acessos individuais e escolha o que cada funcionário pode visualizar ou utilizar.</p></div>
+    <button class="btn secundario" id="atualizar" type="button">↻ Atualizar lista</button>
+  </div>
+  <section class="painel">
+    <h2>➕ Cadastrar operador</h2>
+    <p>O funcionário terá login com CPF e senha própria. A senha deve ter no mínimo 10 caracteres.</p>
+    <form id="form-criar">
+      <div class="grid-form">
+        <div class="campo"><label for="novo-nome">Nome completo</label><input id="novo-nome" maxlength="100" autocomplete="name" required></div>
+        <div class="campo"><label for="novo-cpf">CPF</label><input id="novo-cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required></div>
+        <div class="campo"><label for="nova-senha">Senha inicial</label><input id="nova-senha" type="password" minlength="10" maxlength="72" autocomplete="new-password" required></div>
+      </div>
+      <h3>Permissões iniciais</h3>
+      <div class="perms" id="perms-novo"></div>
+      <div class="acoes"><button class="btn primario" id="criar-btn" type="submit">Criar usuário</button></div>
+    </form>
+    <div id="msg-criar" class="msg" role="status" aria-live="polite"></div>
+  </section>
+  <section class="painel">
+    <div class="topo-usuarios"><h2>Usuários cadastrados</h2><span id="total">Carregando...</span></div>
+    <div class="master-note">A conta Gerente Master é protegida. Esta tela permite personalizar operadores, ativar ou bloquear acessos, sem permitir que um operador promova a si mesmo ou a outra pessoa a gerente.</div>
+    <div id="lista" class="lista" style="margin-top:16px"><div class="vazio">Carregando usuários...</div></div>
+  </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js?v=20261109-permissions"></script>
+<script>
+(() => {
+ const URL='https://vcyneajmmwvvnefqompe.supabase.co';
+ const KEY='sb_publishable_fOe9mU2A_48YLPKq1NB6ZQ_Hg_GZaym';
+ const labels={vendas:'Vendas / PDV',produtos:'Produtos',estoque:'Estoque',fechamento:'Fechamento',relatorios:'Relatórios e consultas',configuracoes:'Configurações',usuarios:'Gerenciar usuários'};
+ const defaults={vendas:true,produtos:false,estoque:false,fechamento:false,relatorios:false,configuracoes:false,usuarios:false};
+ const supabase=window.supabase.createClient(URL,KEY);
+ const $=id=>document.getElementById(id);
+ const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function permissionInputs(container, values, prefix){
+   container.innerHTML=Object.entries(labels).map(([key,label])=>'<label class="perm"><input type="checkbox" data-perm="'+key+'" '+(values[key]?'checked':'')+'> '+label+'</label>').join('');
+ }
+ function readPermissions(container){
+   return Object.fromEntries([...container.querySelectorAll('[data-perm]')].map(el=>[el.dataset.perm,el.checked]));
+ }
+ async function call(payload){
+   const {data,error}=await supabase.functions.invoke('pdv-gerenciar-usuarios',{body:payload});
+   if(error) throw new Error(data?.error||error.message||'Falha ao comunicar com o servidor.');
+   if(data?.error) throw new Error(data.error);
+   return data;
+ }
+ async function load(){
+   $('lista').innerHTML='<div class="vazio">Carregando...</div>';
+   try{
+     const result=await call({action:'list'});
+     const users=result.users||[];
+     $('total').textContent=users.length+' usuário(s)';
+     if(!users.length){$('lista').innerHTML='<div class="vazio">Nenhum usuário cadastrado ainda.</div>';return;}
+     $('lista').innerHTML=users.map(u=>{
+       const master=u.papel==='gerente';
+       const perms=master?Object.fromEntries(Object.keys(labels).map(k=>[k,true])):{...defaults,...(u.permissoes||{})};
+       return '<article class="usuario-card" data-id="'+escapeHtml(u.id)+'">'+
+         '<div class="usuario-head"><div><div class="nome">'+escapeHtml(u.nome||'Sem nome')+'</div><div class="meta">'+escapeHtml(u.email||'')+' · '+(master?'Gerente Master':'Operador')+'</div></div>'+
+         '<span class="tag '+(u.ativo?'':'off')+'">'+(u.ativo?'ATIVO':'BLOQUEADO')+'</span></div>'+
+         (master?'<p class="meta">Acesso administrativo integral protegido.</p>':
+          '<div class="perms">'+Object.entries(labels).map(([key,label])=>'<label class="perm"><input type="checkbox" data-perm="'+key+'" '+(perms[key]?'checked':'')+'> '+label+'</label>').join('')+'</div>'+
+          '<div class="usuario-head"><label class="perm"><input type="checkbox" data-ativo '+(u.ativo?'checked':'')+'> Usuário ativo</label><div class="acoes"><button class="btn primario salvar" type="button">Salvar permissões</button></div></div>')+
+         '</article>';
+     }).join('');
+     $('lista').querySelectorAll('.salvar').forEach(btn=>btn.addEventListener('click',async()=>{
+       const card=btn.closest('.usuario-card');btn.disabled=true;btn.textContent='Salvando...';
+       try{
+         await call({action:'update',user_id:card.dataset.id,ativo:card.querySelector('[data-ativo]').checked,permissoes:readPermissions(card)});
+         btn.textContent='Salvo ✓';await load();
+       }catch(e){alert(e.message);btn.disabled=false;btn.textContent='Salvar permissões';}
+     }));
+   }catch(e){$('lista').innerHTML='<div class="vazio">'+escapeHtml(e.message)+'</div>';$('total').textContent='Não foi possível carregar';}
+ }
+ permissionInputs($('perms-novo'),defaults,'novo');
+ $('form-criar').addEventListener('submit',async e=>{
+   e.preventDefault();const btn=$('criar-btn');const msg=$('msg-criar');btn.disabled=true;btn.textContent='Criando...';msg.className='msg';msg.textContent='';
+   try{
+     await call({action:'create',nome:$('novo-nome').value,cpf:$('novo-cpf').value,senha:$('nova-senha').value,permissoes:readPermissions($('perms-novo'))});
+     msg.textContent='Usuário criado com sucesso. Ele já pode entrar com CPF e senha.';$('form-criar').reset();permissionInputs($('perms-novo'),defaults,'novo');await load();
+   }catch(e){msg.className='msg erro';msg.textContent=e.message;}
+   finally{btn.disabled=false;btn.textContent='Criar usuário';}
+ });
+ $('atualizar').addEventListener('click',load);
+ load();
+})();
+</script>
+</body></html>
