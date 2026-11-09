@@ -7,7 +7,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🥑",
     "estoque": 0,
     "minimo": 0
   },
@@ -18,7 +18,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🥑",
     "estoque": 0,
     "minimo": 0
   },
@@ -29,7 +29,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🥑",
     "estoque": 0,
     "minimo": 0
   },
@@ -40,7 +40,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍍",
     "estoque": 0,
     "minimo": 0
   },
@@ -51,7 +51,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🎃",
     "estoque": 0,
     "minimo": 0
   },
@@ -62,7 +62,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🎃",
     "estoque": 0,
     "minimo": 0
   },
@@ -73,7 +73,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🎃",
     "estoque": 0,
     "minimo": 0
   },
@@ -84,7 +84,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🎃",
     "estoque": 0,
     "minimo": 0
   },
@@ -95,7 +95,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🎃",
     "estoque": 0,
     "minimo": 0
   },
@@ -106,7 +106,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🎃",
     "estoque": 0,
     "minimo": 0
   },
@@ -117,7 +117,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🥒",
     "estoque": 0,
     "minimo": 0
   },
@@ -150,7 +150,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍒",
     "estoque": 0,
     "minimo": 0
   },
@@ -161,7 +161,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "verduras",
-    "emoji": "🥬",
+    "emoji": "🌿",
     "estoque": 0,
     "minimo": 0
   },
@@ -172,7 +172,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "💧",
     "estoque": 0,
     "minimo": 0
   },
@@ -205,7 +205,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🧄",
     "estoque": 0,
     "minimo": 0
   },
@@ -216,7 +216,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🧄",
     "estoque": 0,
     "minimo": 0
   },
@@ -238,7 +238,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍑",
     "estoque": 0,
     "minimo": 0
   },
@@ -249,7 +249,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍑",
     "estoque": 0,
     "minimo": 0
   },
@@ -260,7 +260,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍑",
     "estoque": 0,
     "minimo": 0
   },
@@ -271,7 +271,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🥜",
     "estoque": 0,
     "minimo": 0
   },
@@ -282,7 +282,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🥜",
     "estoque": 0,
     "minimo": 0
   },
@@ -293,7 +293,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍌",
     "estoque": 0,
     "minimo": 0
   },
@@ -304,7 +304,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍌",
     "estoque": 0,
     "minimo": 0
   },
@@ -315,7 +315,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍌",
     "estoque": 0,
     "minimo": 0
   },
@@ -326,7 +326,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍌",
     "estoque": 0,
     "minimo": 0
   },
@@ -337,7 +337,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍌",
     "estoque": 0,
     "minimo": 0
   },
@@ -348,7 +348,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🥔",
     "estoque": 0,
     "minimo": 0
   },
@@ -359,7 +359,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🥔",
     "estoque": 0,
     "minimo": 0
   },
@@ -370,7 +370,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🍠",
     "estoque": 0,
     "minimo": 0
   },
@@ -381,7 +381,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🍠",
     "estoque": 0,
     "minimo": 0
   },
@@ -392,7 +392,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🥔",
     "estoque": 0,
     "minimo": 0
   },
@@ -403,7 +403,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🍆",
     "estoque": 0,
     "minimo": 0
   },
@@ -414,7 +414,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🫜",
     "estoque": 0,
     "minimo": 0
   },
@@ -425,7 +425,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🍪",
     "estoque": 0,
     "minimo": 0
   },
@@ -436,7 +436,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "verduras",
-    "emoji": "🥬",
+    "emoji": "🥦",
     "estoque": 0,
     "minimo": 0
   },
@@ -447,7 +447,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🥜",
     "estoque": 0,
     "minimo": 0
   },
@@ -458,7 +458,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🟠",
     "estoque": 0,
     "minimo": 0
   },
@@ -469,7 +469,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🟠",
     "estoque": 0,
     "minimo": 0
   },
@@ -480,7 +480,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🥔",
     "estoque": 0,
     "minimo": 0
   },
@@ -491,7 +491,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🧅",
     "estoque": 0,
     "minimo": 0
   },
@@ -502,7 +502,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🧅",
     "estoque": 0,
     "minimo": 0
   },
@@ -513,7 +513,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🧅",
     "estoque": 0,
     "minimo": 0
   },
@@ -546,7 +546,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🥒",
     "estoque": 0,
     "minimo": 0
   },
@@ -557,7 +557,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🥥",
     "estoque": 0,
     "minimo": 0
   },
@@ -568,7 +568,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🥥",
     "estoque": 0,
     "minimo": 0
   },
@@ -579,7 +579,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "verduras",
-    "emoji": "🥬",
+    "emoji": "🌿",
     "estoque": 0,
     "minimo": 0
   },
@@ -590,7 +590,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "verduras",
-    "emoji": "🥬",
+    "emoji": "🥦",
     "estoque": 0,
     "minimo": 0
   },
@@ -623,7 +623,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🫚",
     "estoque": 0,
     "minimo": 0
   },
@@ -634,7 +634,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "verduras",
-    "emoji": "🥬",
+    "emoji": "🌿",
     "estoque": 0,
     "minimo": 0
   },
@@ -645,7 +645,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🥔",
     "estoque": 0,
     "minimo": 0
   },
@@ -656,7 +656,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🍆",
     "estoque": 0,
     "minimo": 0
   },
@@ -667,7 +667,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🥝",
     "estoque": 0,
     "minimo": 0
   },
@@ -678,7 +678,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍊",
     "estoque": 0,
     "minimo": 0
   },
@@ -689,7 +689,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍊",
     "estoque": 0,
     "minimo": 0
   },
@@ -700,7 +700,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍊",
     "estoque": 0,
     "minimo": 0
   },
@@ -711,7 +711,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍊",
     "estoque": 0,
     "minimo": 0
   },
@@ -722,7 +722,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🥗",
     "estoque": 0,
     "minimo": 0
   },
@@ -733,7 +733,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍋",
     "estoque": 0,
     "minimo": 0
   },
@@ -777,7 +777,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍈",
     "estoque": 0,
     "minimo": 0
   },
@@ -788,7 +788,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍈",
     "estoque": 0,
     "minimo": 0
   },
@@ -799,7 +799,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🥔",
     "estoque": 0,
     "minimo": 0
   },
@@ -821,7 +821,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🥭",
     "estoque": 0,
     "minimo": 0
   },
@@ -832,7 +832,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🥭",
     "estoque": 0,
     "minimo": 0
   },
@@ -843,7 +843,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🥭",
     "estoque": 0,
     "minimo": 0
   },
@@ -854,7 +854,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🥭",
     "estoque": 0,
     "minimo": 0
   },
@@ -865,7 +865,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🟡",
     "estoque": 0,
     "minimo": 0
   },
@@ -876,7 +876,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🥒",
     "estoque": 0,
     "minimo": 0
   },
@@ -887,7 +887,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍉",
     "estoque": 0,
     "minimo": 0
   },
@@ -898,7 +898,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍉",
     "estoque": 0,
     "minimo": 0
   },
@@ -909,7 +909,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍉",
     "estoque": 0,
     "minimo": 0
   },
@@ -920,7 +920,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍉",
     "estoque": 0,
     "minimo": 0
   },
@@ -931,7 +931,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍈",
     "estoque": 0,
     "minimo": 0
   },
@@ -942,7 +942,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍊",
     "estoque": 0,
     "minimo": 0
   },
@@ -953,7 +953,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍊",
     "estoque": 0,
     "minimo": 0
   },
@@ -964,7 +964,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🌽",
     "estoque": 0,
     "minimo": 0
   },
@@ -975,7 +975,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍓",
     "estoque": 0,
     "minimo": 0
   },
@@ -986,7 +986,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🥚",
     "estoque": 0,
     "minimo": 0
   },
@@ -997,7 +997,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🥚",
     "estoque": 0,
     "minimo": 0
   },
@@ -1008,7 +1008,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🥚",
     "estoque": 0,
     "minimo": 0
   },
@@ -1019,7 +1019,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🥚",
     "estoque": 0,
     "minimo": 0
   },
@@ -1030,7 +1030,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🥚",
     "estoque": 0,
     "minimo": 0
   },
@@ -1041,7 +1041,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🥚",
     "estoque": 0,
     "minimo": 0
   },
@@ -1052,7 +1052,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🥚",
     "estoque": 0,
     "minimo": 0
   },
@@ -1063,7 +1063,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🥚",
     "estoque": 0,
     "minimo": 0
   },
@@ -1074,7 +1074,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🥚",
     "estoque": 0,
     "minimo": 0
   },
@@ -1085,7 +1085,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🥚",
     "estoque": 0,
     "minimo": 0
   },
@@ -1096,7 +1096,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🥚",
     "estoque": 0,
     "minimo": 0
   },
@@ -1107,7 +1107,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🥒",
     "estoque": 0,
     "minimo": 0
   },
@@ -1118,7 +1118,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🥒",
     "estoque": 0,
     "minimo": 0
   },
@@ -1129,7 +1129,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🌶️",
     "estoque": 0,
     "minimo": 0
   },
@@ -1140,7 +1140,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🫑",
     "estoque": 0,
     "minimo": 0
   },
@@ -1151,7 +1151,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🫑",
     "estoque": 0,
     "minimo": 0
   },
@@ -1162,7 +1162,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🫑",
     "estoque": 0,
     "minimo": 0
   },
@@ -1173,7 +1173,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍊",
     "estoque": 0,
     "minimo": 0
   },
@@ -1184,7 +1184,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 2.99,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🏷️",
     "estoque": 0,
     "minimo": 0
   },
@@ -1195,7 +1195,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🥬",
     "estoque": 0,
     "minimo": 0
   },
@@ -1206,7 +1206,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🥬",
     "estoque": 0,
     "minimo": 0
   },
@@ -1239,7 +1239,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "verduras",
-    "emoji": "🥬",
+    "emoji": "🌿",
     "estoque": 0,
     "minimo": 0
   },
@@ -1250,7 +1250,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🛍️",
     "estoque": 0,
     "minimo": 0
   },
@@ -1261,7 +1261,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🥗",
     "estoque": 0,
     "minimo": 0
   },
@@ -1272,7 +1272,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "verduras",
-    "emoji": "🥬",
+    "emoji": "🌿",
     "estoque": 0,
     "minimo": 0
   },
@@ -1283,7 +1283,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🟠",
     "estoque": 0,
     "minimo": 0
   },
@@ -1294,7 +1294,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "outros",
-    "emoji": "🛒",
+    "emoji": "🧃",
     "estoque": 0,
     "minimo": 0
   },
@@ -1305,7 +1305,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🍅",
     "estoque": 0,
     "minimo": 0
   },
@@ -1316,7 +1316,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🍅",
     "estoque": 0,
     "minimo": 0
   },
@@ -1327,7 +1327,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "un",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🍅",
     "estoque": 0,
     "minimo": 0
   },
@@ -1338,7 +1338,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🍅",
     "estoque": 0,
     "minimo": 0
   },
@@ -1349,7 +1349,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍇",
     "estoque": 0,
     "minimo": 0
   },
@@ -1360,7 +1360,7 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "frutas",
-    "emoji": "🍎",
+    "emoji": "🍇",
     "estoque": 0,
     "minimo": 0
   },
@@ -1371,13 +1371,13 @@ window.CATALOGO_PRODUTOS = [
     "preco": 0,
     "unidade": "kg",
     "categoria": "legumes",
-    "emoji": "🥕",
+    "emoji": "🫛",
     "estoque": 0,
     "minimo": 0
   }
-];
+]
 window.mesclarCatalogoProdutos = function (atuais) {
-  try { if (localStorage.getItem("catalogoProdutosVersao") === "1") return Array.isArray(atuais) ? atuais : []; } catch (_) {}
+  try { if (localStorage.getItem("catalogoProdutosVersao") === "2") return Array.isArray(atuais) ? atuais : []; } catch (_) {}
   const exemplos = new Set(["Maçã Fuji","Banana Prata","Laranja Pera"]);
   let lista = Array.isArray(atuais) ? [...atuais] : [];
   if (lista.length === 3 && lista.every(p => exemplos.has(p.nome))) lista = [];
@@ -1386,6 +1386,9 @@ window.mesclarCatalogoProdutos = function (atuais) {
     const chave = String(item.codigo).trim()+"|"+item.nome.toLocaleLowerCase("pt-BR");
     if (!chaves.has(chave)) { lista.push({...item}); chaves.add(chave); }
   }
-  try { localStorage.setItem("catalogoProdutosVersao", "1"); } catch (_) {}
+  try { localStorage.setItem("catalogoProdutosVersao", "2"); } catch (_) {}
+  const emojis = new Map(window.CATALOGO_PRODUTOS.map(p => [String(p.codigo).trim()+"|"+p.nome.toLocaleLowerCase("pt-BR"), p.emoji]));
+  for (const p of lista) { const chave = String(p.codigo ?? "").trim()+"|"+String(p.nome ?? "").trim().toLocaleLowerCase("pt-BR"); if (emojis.has(chave)) p.emoji = emojis.get(chave); }
+  try { localStorage.setItem("catalogoProdutosVersao", "2"); } catch (_) {}
   return lista;
 };
