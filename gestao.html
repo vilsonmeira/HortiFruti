@@ -194,7 +194,7 @@
             <form id="form-prod">
                 <input type="hidden" id="prod-id">
                 <div class="grade-form">
-                    <div class="grupo-form"><label>Código</label><input type="text" id="prod-cod" required></div>
+                    <div class="grupo-form"><label>Código</label><input type="text" id="prod-cod"></div>
                     <div class="grupo-form"><label>Nome</label><input type="text" id="prod-nome" required></div>
                     <div class="grupo-form"><label>Emoji</label><input type="text" id="prod-emoji" required></div>
                     <div class="grupo-form"><label>Categoria</label>
@@ -265,12 +265,9 @@
         }
 
         // ===== DADOS =====
-        const produtosPadrao = [
-            {id:1,codigo:"001",nome:"Maçã Fuji",preco:8.99,unidade:"kg",categoria:"frutas",emoji:"🍎",estoque:50,minimo:10},
-            {id:2,codigo:"002",nome:"Banana Prata",preco:4.99,unidade:"kg",categoria:"frutas",emoji:"🍌",estoque:30,minimo:8},
-            {id:3,codigo:"003",nome:"Laranja Pera",preco:6.50,unidade:"kg",categoria:"frutas",emoji:"🍊",estoque:40,minimo:10}
-        ];
-        let produtos = carregarDados('produtos', produtosPadrao);
+        const produtosPadrao = window.CATALOGO_PRODUTOS || [];
+        let produtos = window.mesclarCatalogoProdutos(carregarDados('produtos', produtosPadrao));
+        salvarDados('produtos', produtos);
         let historicoVendas = carregarDados('historicoVendas', []);
         let movEstoque = carregarDados('movimentacoesEstoque', []);
         let cfg = carregarDados('configuracoes', {nome:'Hortifruti',cnpj:'',tel:'',cidade:''});
@@ -418,7 +415,7 @@
         // ===== PRODUTOS =====
         function carregarProd(f = '') {
             const l = produtos.filter(p => p.nome.toLowerCase().includes(f.toLowerCase()) || p.codigo.includes(f));
-            document.getElementById('tab-prod').innerHTML = l.map(p => `<tr><td>${escapeHTML(p.codigo)}</td><td>${escapeHTML(p.emoji)} ${escapeHTML(p.nome)}</td><td>${escapeHTML(p.categoria)}</td><td>R$ ${p.preco.toFixed(2)}</td><td>${escapeHTML(p.estoque || 0)}</td><td><button class="btn-tabela btn-primario" onclick="editarProd(${Number(p.id)})">✏️</button><button class="btn-tabela btn-perigo" onclick="excluirProd(${Number(p.id)})">🗑️</button></td></tr>`).join('');
+            document.getElementById('tab-prod').innerHTML = l.map(p => `<tr><td>${escapeHTML(p.codigo)}</td><td>${escapeHTML(p.emoji)} ${escapeHTML(p.nome)}</td><td>${escapeHTML(p.categoria)}</td><td>${p.preco > 0 ? `R$ ${p.preco.toFixed(2)}` : "Definir preço"}</td><td>${escapeHTML(p.estoque || 0)}</td><td><button class="btn-tabela btn-primario" onclick="editarProd(${Number(p.id)})">✏️</button><button class="btn-tabela btn-perigo" onclick="excluirProd(${Number(p.id)})">🗑️</button></td></tr>`).join('');
         }
         document.getElementById('busca-prod').oninput = e => carregarProd(e.target.value);
 
@@ -439,7 +436,7 @@
                 estoque: parseFloat(document.getElementById('prod-est').value || 0),
                 minimo: parseFloat(document.getElementById('prod-min').value || 5)
             };
-            if (!dados.codigo.trim() || !dados.nome.trim()) return alert('Código e nome do produto são obrigatórios!');
+            if (!dados.nome.trim()) return alert('O nome do produto é obrigatório!');
             if (!Number.isFinite(dados.preco) || dados.preco <= 0) return alert('Preço deve ser maior que zero!');
             if (!Number.isFinite(dados.estoque) || dados.estoque < 0 || !Number.isFinite(dados.minimo) || dados.minimo < 0) return alert('Estoque e estoque mínimo devem ser números válidos, iguais ou maiores que zero.');
             dados.codigo = dados.codigo.trim();
