@@ -39,11 +39,8 @@ body{background:#f4f7f2}.usuarios-wrap{max-width:1100px;margin:24px auto;padding
 <script src="auth.js?v=20261109-users2"></script>
 <script>
 (() => {
- const URL='https://vcyneajmmwvvnefqompe.supabase.co';
- const KEY='sb_publishable_fOe9mU2A_48YLPKq1NB6ZQ_Hg_GZaym';
  const labels={vendas:'Vendas / PDV',produtos:'Produtos',estoque:'Estoque',fechamento:'Fechamento',relatorios:'Relatórios e consultas',configuracoes:'Configurações'};
  const defaults={vendas:true,produtos:false,estoque:false,fechamento:false,relatorios:false,configuracoes:false};
- const supabase=window.supabase.createClient(URL,KEY);
  const $=id=>document.getElementById(id);
  const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function permissionInputs(container, values, prefix){
@@ -52,7 +49,13 @@ body{background:#f4f7f2}.usuarios-wrap{max-width:1100px;margin:24px auto;padding
  function readPermissions(container){
    return Object.fromEntries([...container.querySelectorAll('[data-perm]')].map(el=>[el.dataset.perm,el.checked]));
  }
+ function clienteAutenticado(){
+   const auth=window.pdvAuth;
+   if(!auth || auth.papel!=='gerente' || !auth.supabase) throw new Error('Entre como Gerente Master para continuar.');
+   return auth.supabase;
+ }
  async function call(payload){
+   const supabase=clienteAutenticado();
    const {data,error}=await supabase.functions.invoke('pdv-gerenciar-usuarios',{body:payload});
    if(error) throw new Error(data?.error||error.message||'Falha ao comunicar com o servidor.');
    if(data?.error) throw new Error(data.error);
@@ -95,7 +98,9 @@ body{background:#f4f7f2}.usuarios-wrap{max-width:1100px;margin:24px auto;padding
    finally{btn.disabled=false;btn.textContent='Criar usuário';}
  });
  $('atualizar').addEventListener('click',load);
- load();
+ // A autenticação é assíncrona; aguarda a sessão validada antes de chamar a Edge Function.
+ if(window.pdvAuth?.papel==='gerente') load();
+ else window.addEventListener('pdv-auth-ready',event=>{if(event.detail?.papel==='gerente') load();},{once:true});
 })();
 </script>
 </body></html>
