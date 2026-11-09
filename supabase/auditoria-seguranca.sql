@@ -157,3 +157,27 @@ create index if not exists pdv_cancelamentos_item_id_idx on public.pdv_cancelame
 create index if not exists pdv_venda_itens_cancelado_por_idx on public.pdv_venda_itens(cancelado_por);
 create index if not exists pdv_vendas_cancelada_por_idx on public.pdv_vendas(cancelada_por);
 create index if not exists pdv_vendas_criada_por_idx on public.pdv_vendas(criada_por);
+
+
+-- Catálogo: leitura pública somente de produtos ativos; gestão só pelo gerente.
+drop policy if exists "Admin gerencia catálogo" on public.products;
+drop policy if exists "Catálogo ativo visível ao público" on public.products;
+drop policy if exists "Produtos ativos visíveis ao público" on public.products;
+drop policy if exists "Usuários autenticados consultam catálogo" on public.products;
+create policy "Produtos ativos visíveis ao público"
+on public.products for select to anon using (active is true);
+create policy "Usuários autenticados consultam catálogo"
+on public.products for select to authenticated
+using (active is true or public.hortifruti_is_admin());
+create policy "Gerente cadastra produtos"
+on public.products for insert to authenticated
+with check (public.hortifruti_is_admin());
+create policy "Gerente atualiza produtos"
+on public.products for update to authenticated
+using (public.hortifruti_is_admin()) with check (public.hortifruti_is_admin());
+create policy "Gerente exclui produtos"
+on public.products for delete to authenticated
+using (public.hortifruti_is_admin());
+revoke all on table public.products from anon;
+grant select on table public.products to anon;
+grant select, insert, update, delete on table public.products to authenticated;
