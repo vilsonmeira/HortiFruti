@@ -5,7 +5,8 @@
   const SUPABASE_URL = 'https://vcyneajmmwvvnefqompe.supabase.co';
   const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_fOe9mU2A_48YLPKq1NB6ZQ_Hg_GZaym';
   const pagina = location.pathname.split('/').pop() || 'index.html';
-  const exigeGerente = ['gestao.html', 'vendas.html', 'admin-senhas.html'].includes(pagina);
+  const exigeGerente = ['usuarios.html', 'admin-senhas.html'].includes(pagina);
+  const permissoesGestao = ['produtos','estoque','fechamento','relatorios','configuracoes'];
   let cliente;
   let recoveryFormShown = false;
 
@@ -115,7 +116,7 @@
     });
   }
 
-  function liberar(user, papel, nomePerfil) {
+  function liberar(user, papel, nomePerfil, permissoes = {}) {
     tela.remove();
     const faixa = document.createElement('div');
     faixa.id = 'pdv-auth-user';
@@ -136,14 +137,30 @@
       if (error) { alert('Não foi possível sair. Tente novamente.'); sair.disabled = false; }
       else location.reload();
     });
+    if (papel === 'gerente' && pagina === 'gestao.html') {
+      const usuarios = document.createElement('a'); usuarios.href = 'usuarios.html'; usuarios.textContent = 'Usuários'; faixa.appendChild(usuarios);
+    }
     faixa.append(nome, sair);
     document.body.appendChild(faixa);
-    window.pdvAuth = { user, papel, supabase: cliente };
+    window.pdvAuth = { user, papel, permissoes: papel === 'gerente' ? Object.fromEntries(['vendas','produtos','estoque','fechamento','relatorios','configuracoes','usuarios'].map(k => [k,true])) : permissoes, supabase: cliente };
+    if (pagina === 'gestao.html' && papel !== 'gerente') {
+      document.querySelectorAll('.aba-btn[data-aba]').forEach(btn => {
+        const aba = btn.dataset.aba;
+        const chave = ({'visao-geral':'relatorios','produtos':'produtos','estoque':'estoque','calendario':'fechamento','configuracoes':'configuracoes','etiquetas':'produtos'})[aba];
+        if (chave && !permissoes[chave]) btn.style.display = 'none';
+      });
+      document.querySelectorAll('.aba').forEach(section => {
+        const chave = ({'visao-geral':'relatorios','produtos':'produtos','estoque':'estoque','calendario':'fechamento','configuracoes':'configuracoes','etiquetas':'produtos'})[section.id];
+        if (chave && !permissoes[chave]) section.remove();
+      });
+      const primeiro = document.querySelector('.aba-btn[data-aba]:not([style*="display: none"])');
+      if (primeiro) { document.querySelectorAll('.aba').forEach(x=>x.classList.remove('ativa')); document.querySelectorAll('.aba-btn').forEach(x=>x.classList.remove('ativo')); primeiro.classList.add('ativo'); document.getElementById(primeiro.dataset.aba)?.classList.add('ativa'); }
+    }
   }
 
   async function validarAcesso(user) {
     const { data, error } = await cliente.from('perfis')
-      .select('id,nome,email,papel,perfil,ativo')
+      .select('id,nome,email,papel,perfil,ativo,permissoes')
       .eq('id', user.id).maybeSingle();
     if (error) throw new Error('Não foi possível consultar seu perfil. Verifique as permissões da tabela de perfis.');
     if (!data) throw new Error('Esta conta ainda não possui perfil cadastrado. Configure o gerente master ou peça ao gerente para vinculá-la.');
@@ -156,12 +173,12 @@
     const papel = data.papel || data.perfil;
     if (!['gerente', 'operador'].includes(papel)) throw new Error('Seu usuário não possui um perfil válido.');
     if (data.ativo !== true) throw new Error('Este usuário está inativo. Solicite ao gerente a reativação do acesso.');
-    if (exigeGerente && papel !== 'gerente') {
-      await cliente.auth.signOut();
-      location.replace('index.html');
-      return false;
-    }
-    liberar(user, papel, data.nome);
+    const permissoes = data.permissoes || {vendas:true};
+    if (exigeGerente && papel !== 'gerente') throw new Error('Esta área é exclusiva do Gerente Master.');
+    if (pagina === 'gestao.html' && papel !== 'gerente' && !permissoesGestao.some(k => permissoes[k] === true)) throw new Error('Seu usuário não possui permissões para acessar a Gestão.');
+    if (pagina === 'index.html' && papel !== 'gerente' && permissoes.vendas !== true) throw new Error('Seu usuário não possui permissão para realizar vendas.');
+    if (pagina === 'vendas.html' && papel !== 'gerente' && permissoes.relatorios !== true) throw new Error('Seu usuário não possui permissão para consultar vendas e relatórios.');
+    liberar(user, papel, data.nome, permissoes);
     return true;
   }
 
