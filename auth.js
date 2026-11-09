@@ -69,7 +69,7 @@
     if (error) throw new Error('Não foi possível consultar seu perfil: ' + error.message);
     if (!data || !['gerente','operador'].includes(data.papel)) throw new Error('Seu usuário não possui um perfil válido. Peça ao gerente para cadastrá-lo.');
     if (exigeGerente && data.papel !== 'gerente') {
-      bloquear('Esta área é exclusiva do gerente. O operador pode acessar somente o caixa.');
+      location.replace('index.html');
       return false;
     }
     liberar(user, data.papel);
@@ -101,7 +101,7 @@
       } else {
         try {
           const ok = await validarAcesso(login.user);
-          if (!ok) await cliente.auth.signOut();
+          // Operadores são direcionados ao caixa sem encerrar a sessão.
         } catch (e) {
           await cliente.auth.signOut();
           mostrarErro(e.message);
