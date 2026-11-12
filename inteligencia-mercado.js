@@ -41,7 +41,7 @@ async function load(){
  if(error){out.textContent='Não foi possível consultar as cotações. Confira a migração e as permissões do banco.';return;}
  const refs=data||[],status=document.getElementById('intel-data-status');
  if(status)status.textContent=refs.length?'Cotação mais recente: '+datePt(refs[0].data_referencia)+'. Confira sempre variedade, qualidade, unidade e região.':'Nenhuma cotação cadastrada. Consulte as fontes oficiais e registre os valores para iniciar a comparação.';
- const products=Array.isArray(window.produtos)?window.produtos:[];
+ const products=typeof produtos!=='undefined' && Array.isArray(produtos)?produtos:[];
  const rows=[];
  products.forEach(p=>{
   const matching=refs.filter(r=>norm(r.produto_nome)===norm(p.nome)&&String(r.unidade).toLowerCase()===String(p.unidade||'kg').toLowerCase());
