@@ -45,13 +45,17 @@ async function load(){
  const rows=[];
  products.forEach(p=>{
   const matching=refs.filter(r=>norm(r.produto_nome)===norm(p.nome)&&String(r.unidade).toLowerCase()===String(p.unidade||'kg').toLowerCase());
-  const wholesale=matching.filter(r=>r.tipo_mercado==='atacado'),retail=matching.filter(r=>r.tipo_mercado==='varejo');
+  const allWholesale=matching.filter(r=>r.tipo_mercado==='atacado'),allRetail=matching.filter(r=>r.tipo_mercado==='varejo');
+  const latestOnly=a=>{if(!a.length)return [];const latest=a[0].data_referencia;return a.filter(r=>r.data_referencia===latest);};
+  const wholesale=latestOnly(allWholesale),retail=latestOnly(allRetail);
   const avg=a=>a.length?a.reduce((sum,r)=>sum+Number(r.preco),0)/a.length:null;
   const a=avg(wholesale),v=avg(retail),price=Number(p.preco);if(a===null&&v===null)return;
   const pct=x=>x===null||!price?'—':((price/x-1)*100).toFixed(1).replace('.',',')+'%';
-  rows.push('<tr><td><strong>'+esc(p.nome)+'</strong><br><span class="intel-muted">Seu preço: '+money(price)+'/'+esc(p.unidade||'kg')+'</span></td><td>'+(a===null?'—':money(a))+'<br><span class="intel-muted">'+(wholesale[0]?datePt(wholesale[0].data_referencia)+' · '+esc(wholesale[0].fonte):'')+'</span></td><td>'+(v===null?'—':money(v))+'<br><span class="intel-muted">'+(retail[0]?datePt(retail[0].data_referencia)+' · '+esc(retail[0].fonte):'')+'</span></td><td>'+pct(a)+' / '+pct(v)+'</td></tr>');
+  const highWholesale=a!==null&&price>a,highRetail=v!==null&&price>v;
+  const reason=highWholesale&&highRetail?'Acima das duas referências. Revise custo de compra, frete, perdas, qualidade e margem.':highWholesale?'Acima do atacado registrado; confira custo de reposição e frete.':highRetail?'Acima da referência varejista; avalie concorrência, qualidade e margem.':'Preço dentro ou abaixo das referências disponíveis. Confira se variedade e qualidade são equivalentes.';
+  rows.push('<tr><td><strong>'+esc(p.nome)+'</strong><br><span class="intel-muted">Seu preço: '+money(price)+'/'+esc(p.unidade||'kg')+'</span></td><td>'+(a===null?'—':money(a))+'<br><span class="intel-muted">'+(wholesale[0]?datePt(wholesale[0].data_referencia)+' · '+esc(wholesale[0].fonte):'')+'</span></td><td>'+(v===null?'—':money(v))+'<br><span class="intel-muted">'+(retail[0]?datePt(retail[0].data_referencia)+' · '+esc(retail[0].fonte):'')+'</span></td><td>'+pct(a)+' / '+pct(v)+'</td><td class="intel-muted">'+reason+'</td></tr>');
  });
- out.innerHTML=rows.length?'<div class="intel-table-wrap"><table class="intel-table"><thead><tr><th>Produto / preço atual</th><th>Atacado médio</th><th>Varejo médio</th><th>Diferença vs. seu preço<br><span class="intel-muted">atacado / varejo</span></th></tr></thead><tbody>'+rows.join('')+'</tbody></table></div><p class="intel-muted" style="margin-top:8px">Médias calculadas com as cotações registradas para o mesmo produto e unidade. Não misture variedades ou embalagens diferentes.</p>':'<p style="margin-top:10px">Ainda não há cotações correspondentes aos produtos e unidades cadastrados. Registre uma cotação para começar.</p>';
+ out.innerHTML=rows.length?'<div class="intel-table-wrap"><table class="intel-table"><thead><tr><th>Produto / preço atual</th><th>Atacado médio</th><th>Varejo médio</th><th>Diferença vs. seu preço<br><span class="intel-muted">atacado / varejo</span></th><th>Leitura / possíveis fatores</th></tr></thead><tbody>'+rows.join('')+'</tbody></table></div><p class="intel-muted" style="margin-top:8px">Médias calculadas com as cotações mais recentes registradas para o mesmo produto e unidade. A comparação aponta diferenças, mas não prova a causa do preço: valide variedade, qualidade, frete, perdas e custo de reposição.</p>':'<p style="margin-top:10px">Ainda não há cotações correspondentes aos produtos e unidades cadastrados. Registre uma cotação para começar.</p>';
  const manager=document.getElementById('intel-manager');if(manager&&window.pdvAuth?.papel==='gerente')manager.hidden=false;
  const form=document.getElementById('intel-form');
  if(form&&!form.dataset.bound){
