@@ -301,6 +301,14 @@ document.getElementById('btn-finalizar').addEventListener('click', async () => {
         alert('Venda salva, mas o módulo de impressão não carregou. Atualize a página e reimprima pelo histórico.');
     }
 
+    try {
+        const envioWhatsApp = await window.enviarComprovanteWhatsApp?.(venda);
+        if (envioWhatsApp?.enviado) alert('Comprovante enviado ao WhatsApp do cliente.');
+    } catch (erroWhatsApp) {
+        console.error('Falha no envio automático do WhatsApp:', erroWhatsApp);
+        alert('Venda concluída e salva. Não foi possível enviar o comprovante pelo WhatsApp: ' + (erroWhatsApp.message || 'erro de conexão') + '. O comprovante continua disponível no PDV.');
+    }
+
     carrinho = [];
     formaPagamento = null;
     atualizarCarrinho();
