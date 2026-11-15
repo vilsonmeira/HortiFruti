@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#2e7d32">
+<title>Central Gerencial | Hortifruti Jardim Celeste</title>
+<link rel="stylesheet" href="style.css">
+<style>
+:root{--verde:#246b32;--fundo:#f3f7f2;--borda:#e2e9e1}
+*{box-sizing:border-box}body{margin:0;background:var(--fundo);font-family:Arial,sans-serif;color:#203024}
+.topo{background:linear-gradient(120deg,#174b25,#328443);color:#fff;padding:22px max(18px,calc((100% - 1200px)/2));display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.topo h1{margin:0;font-size:clamp(21px,4vw,30px)}.topo p{margin:6px 0 0;opacity:.9}
+.acoes{display:flex;gap:8px;flex-wrap:wrap}.acoes a{color:#174b25;background:#fff;text-decoration:none;padding:10px 13px;border-radius:9px;font-weight:700}
+main{max-width:1200px;margin:24px auto;padding:0 16px}.intro{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.intro h2{margin:0 0 5px}.intro p{margin:0;color:#607064}.busca{padding:11px 14px;border:1px solid var(--borda);border-radius:10px;min-width:min(100%,280px);font-size:15px}
+.grupo{background:#fff;border:1px solid var(--borda);border-radius:15px;padding:17px;margin:16px 0;box-shadow:0 3px 12px #183d1b0a}
+.grupo h3{margin:0 0 14px;display:flex;align-items:center;gap:9px}.contagem{font-size:12px;color:#647568;font-weight:500}
+.grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.item{border:1px solid var(--borda);border-radius:11px;padding:13px;display:flex;align-items:center;gap:11px;min-height:72px;background:#fff;color:inherit;text-decoration:none;cursor:pointer;text-align:left;width:100%}
+.item:hover{border-color:#8bb995;background:#f8fcf8}.icone{font-size:24px;width:34px;text-align:center}.nome{font-weight:700;display:block}.desc{font-size:12px;color:#68786b;display:block;margin-top:4px}
+.item[aria-disabled=true]{cursor:default;background:#fafbfa}.item[aria-disabled=true]:hover{border-color:var(--borda);background:#fafbfa}
+.aviso{background:#fff8e7;border:1px solid #f1dfae;color:#71551a;padding:13px 15px;border-radius:10px;line-height:1.45;margin:18px 0}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:center;justify-content:center;padding:16px}.modal.aberto{display:flex}.caixa{background:#fff;border-radius:14px;padding:22px;max-width:440px;width:100%}.caixa h3{margin-top:0}.caixa button{border:0;border-radius:8px;background:var(--verde);color:#fff;padding:10px 15px;font-weight:700;cursor:pointer}
+@media(max-width:600px){.topo{padding:18px}.grupo{padding:13px}.grade{grid-template-columns:1fr 1fr}.item{padding:10px;min-height:78px;gap:7px}.icone{font-size:20px;width:26px}.nome{font-size:13px}.desc{font-size:11px}}
+@media(max-width:380px){.grade{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="topo"><div><h1>🍉 Hortifruti Jardim Celeste</h1><p>Central Gerencial do sistema</p></div><nav class="acoes"><a href="gestao.html">📊 Gestão atual</a><a href="index.html">🛒 Abrir caixa</a></nav></header>
+<main>
+<section class="intro"><div><h2>Menu Gerencial</h2><p>Cadastros, operação, indicadores e configurações em um só lugar.</p></div><input id="filtro" class="busca" type="search" placeholder="🔎 Buscar função..."></section>
+<div class="aviso"><strong>Importante:</strong> esta central reúne os módulos solicitados. Os recursos que já existem no PDV direcionam para a gestão atual; os demais ficam identificados como “Integração pendente” até receberem tela, banco de dados, permissões e testes. Assim, nenhum botão simula uma operação que ainda não foi implementada.</div>
+<div id="menus">
+<section class="grupo" data-grupo><h3>👥 Cadastros <span class="contagem">9 funções</span></h3><div class="grade">
+<a class="item" href="clientes-pendentes.html" data-nome="Clientes"><span class="icone">👤</span><span><span class="nome">Clientes</span><span class="desc">Cadastro e consulta — gestão de clientes</span></span></a>
+<a class="item" href="gestao.html" data-nome="Grupos"><span class="icone">🗂️</span><span><span class="nome">Grupos</span><span class="desc">Categorias e grupos de produtos</span></span></a>
+<a class="item" href="gestao.html" data-nome="Produtos"><span class="icone">🥬</span><span><span class="nome">Produtos</span><span class="desc">Cadastro, preços e unidades</span></span></a>
+<button class="item" data-pendente="Forma de Pagamento"><span class="icone">💳</span><span><span class="nome">Forma de Pagamento</span><span class="desc">Integração pendente</span></span></button>
+<button class="item" data-pendente="Mesas"><span class="icone">🪑</span><span><span class="nome">Mesas</span><span class="desc">Integração pendente</span></span></button>
+<button class="item" data-pendente="Comandas"><span class="icone">🧾</span><span><span class="nome">Comandas</span><span class="desc">Integração pendente</span></span></button>
+<a class="item" href="usuarios.html" data-nome="Usuários"><span class="icone">🧑‍💼</span><span><span class="nome">Usuários</span><span class="desc">Usuários e permissões</span></span></a>
+<button class="item" data-pendente="Vendedor"><span class="icone">🧑‍💻</span><span><span class="nome">Vendedor</span><span class="desc">Integração pendente</span></span></button>
+<button class="item" data-pendente="Entregador"><span class="icone">🛵</span><span><span class="nome">Entregador</span><span class="desc">Integração pendente</span></span></button>
+</div></section>
+<section class="grupo" data-grupo><h3>📋 Gerencial <span class="contagem">9 funções</span></h3><div class="grade">
+<a class="item" href="vendas.html" data-nome="Consultar Vendas"><span class="icone">🧾</span><span><span class="nome">Consultar Vendas</span><span class="desc">Histórico de vendas</span></span></a>
+<button class="item" data-pendente="Consultar Pedidos"><span class="icone">📝</span><span><span class="nome">Consultar Pedidos</span><span class="desc">Integração pendente</span></span></button>
+<a class="item" href="gestao.html" data-nome="Fechamento de Caixa"><span class="icone">🧮</span><span><span class="nome">Fechamento de Caixa</span><span class="desc">Fechamento diário existente</span></span></a>
+<a class="item" href="gestao.html" data-nome="Faturamento"><span class="icone">💵</span><span><span class="nome">Faturamento</span><span class="desc">Resumo da gestão atual</span></span></a>
+<button class="item" data-pendente="Produtos Vendidos"><span class="icone">📦</span><span><span class="nome">Produtos Vendidos</span><span class="desc">Integração pendente</span></span></button>
+<button class="item" data-pendente="Relatório Fiscal"><span class="icone">📑</span><span><span class="nome">Relatório Fiscal</span><span class="desc">Integração fiscal pendente</span></span></button>
+<a class="item" href="gestao.html" data-nome="Estoque"><span class="icone">🏬</span><span><span class="nome">Estoque</span><span class="desc">Movimentações e saldo</span></span></a>
+<button class="item" data-pendente="Contas a Pagar"><span class="icone">💸</span><span><span class="nome">Contas a Pagar</span><span class="desc">Integração pendente</span></span></button>
+<button class="item" data-pendente="Enviar XML"><span class="icone">✉️</span><span><span class="nome">Enviar XML</span><span class="desc">Integração fiscal pendente</span></span></button>
+</div></section>
+<section class="grupo" data-grupo><h3>📊 Gráficos e Relatórios <span class="contagem">7 funções</span></h3><div class="grade">
+<button class="item" data-pendente="Faturamento Mensal"><span class="icone">📈</span><span><span class="nome">Faturamento Mensal</span><span class="desc">Integração pendente</span></span></button>
+<button class="item" data-pendente="Faturamento Diário"><span class="icone">📉</span><span><span class="nome">Faturamento Diário</span><span class="desc">Integração pendente</span></span></button>
+<button class="item" data-pendente="Top 10 Produtos"><span class="icone">🏆</span><span><span class="nome">Top 10 Produtos</span><span class="desc">Integração pendente</span></span></button>
+<button class="item" data-pendente="Top 10 Clientes"><span class="icone">🥇</span><span><span class="nome">Top 10 Clientes</span><span class="desc">Integração pendente</span></span></button>
+<button class="item" data-pendente="Gráficos Diversos"><span class="icone">📊</span><span><span class="nome">Gráficos Diversos</span><span class="desc">Integração pendente</span></span></button>
+<button class="item" data-pendente="Comissão de Vendas"><span class="icone">🪙</span><span><span class="nome">Comissão de Vendas</span><span class="desc">Integração pendente</span></span></button>
+<button class="item" data-pendente="Ranking de Vendas"><span class="icone">🏅</span><span><span class="nome">Ranking de Vendas</span><span class="desc">Integração pendente</span></span></button>
+</div></section>
+<section class="grupo" data-grupo><h3>⚙️ Configurações <span class="contagem">9 funções</span></h3><div class="grade">
+<a class="item" href="gestao.html" data-nome="Estabelecimento"><span class="icone">🏪</span><span><span class="nome">Estabelecimento</span><span class="desc">Dados básicos da loja</span></span></a>
+<a class="item" href="gestao.html" data-nome="Configurações"><span class="icone">⚙️</span><span><span class="nome">Configurações</span><span class="desc">Preferências atuais do PDV</span></span></a>
+<button class="item" data-pendente="NFC-e / SAT / TEF"><span class="icone">🧾</span><span><span class="nome">NFC-e / SAT / TEF</span><span class="desc">Integração fiscal e pagamentos</span></span></button>
+<button class="item" data-pendente="Conta de E-mail"><span class="icone">✉️</span><span><span class="nome">Conta de E-mail</span><span class="desc">Integração pendente</span></span></button>
+<button class="item" data-pendente="Balança"><span class="icone">⚖️</span><span><span class="nome">Balança</span><span class="desc">Integração pendente</span></span></button>
+<a class="item" href="gestao.html" data-nome="Impressora"><span class="icone">🖨️</span><span><span class="nome">Impressora</span><span class="desc">Impressão de etiquetas já disponível</span></span></a>
+<button class="item" data-pendente="Sistema"><span class="icone">🖥️</span><span><span class="nome">Sistema</span><span class="desc">Integração pendente</span></span></button>
+<button class="item" data-pendente="Comanda Eletrônica"><span class="icone">📱</span><span><span class="nome">Comanda Eletrônica</span><span class="desc">Integração pendente</span></span></button>
+<button class="item" data-pendente="Logoff"><span class="icone">🚪</span><span><span class="nome">Logoff</span><span class="desc">Sair da conta pelo controle de acesso</span></span></button>
+</div></section>
+</div>
+</main>
+<div class="modal" id="modal"><section class="caixa" role="dialog" aria-modal="true" aria-labelledby="modal-titulo"><h3 id="modal-titulo">Módulo em preparação</h3><p id="modal-texto"></p><button id="fechar" type="button">Entendi</button></section></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js?v=20261115-menu1"></script>
+<script>
+const filtro=document.getElementById('filtro');
+filtro.addEventListener('input',()=>{const q=filtro.value.trim().toLocaleLowerCase('pt-BR');document.querySelectorAll('.item').forEach(el=>{el.hidden=!el.textContent.toLocaleLowerCase('pt-BR').includes(q)});document.querySelectorAll('[data-grupo]').forEach(g=>{g.hidden=!Array.from(g.querySelectorAll('.item')).some(el=>!el.hidden)})});
+const modal=document.getElementById('modal');
+document.querySelectorAll('[data-pendente]').forEach(btn=>btn.addEventListener('click',()=>{document.getElementById('modal-titulo').textContent=btn.dataset.pendente;document.getElementById('modal-texto').textContent='Este item já está listado na Central Gerencial, mas sua operação ainda precisa ser implementada e conectada ao banco de dados. Nenhum lançamento será simulado.';modal.classList.add('aberto')}));
+document.getElementById('fechar').addEventListener('click',()=>modal.classList.remove('aberto'));
+modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('aberto')});
+</script>
+</body></html>
