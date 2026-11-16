@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2e7d32">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+<title>Menu Gerencial | Hortifruti Jardim Celeste</title>
+<style>
+:root{--verde:#2e7d32;--verde-escuro:#1b5e20;--fundo:#f4f7f2}
+body{background:var(--fundo)}
+.menu-gerencial{max-width:1400px;margin:22px auto;padding:0 16px 32px}
+.topo-gerencial{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.topo-gerencial h2{margin:0;color:#243b27}
+.topo-gerencial p{margin:5px 0 0;color:#617064}
+.acoes-topo{display:flex;gap:8px;flex-wrap:wrap}
+.acao-topo{display:inline-flex;align-items:center;gap:7px;padding:10px 14px;border-radius:9px;text-decoration:none;background:var(--verde);color:white;font-weight:700}
+.acao-topo.sec{background:#e4eee3;color:#245b29}
+.colunas-menu{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;align-items:start}
+.grupo-menu{background:#fff;border:1px solid #e2e9e0;border-radius:13px;overflow:hidden;box-shadow:0 3px 12px #16351a0b}
+.grupo-menu h3{font-size:1rem;margin:0;padding:15px 16px;background:#e8f3e7;color:#245b29;border-bottom:1px solid #dce9da}
+.itens-menu{padding:9px;display:grid;gap:7px}
+.item-menu{display:flex;align-items:center;gap:11px;padding:11px 10px;border:1px solid #edf1eb;border-radius:9px;color:#29362b;text-decoration:none;background:#fff;min-height:54px;transition:.15s}
+.item-menu:hover{border-color:#9ac69b;background:#f7fbf6;transform:translateY(-1px)}
+.item-menu .icone{font-size:1.35rem;width:31px;text-align:center;flex:0 0 31px}
+.item-menu strong{display:block;font-size:.9rem}
+.item-menu small{display:block;color:#738075;font-size:.73rem;margin-top:3px;line-height:1.25}
+.item-menu.breve{background:#fafbf9;border-style:dashed;color:#68736a;cursor:default}
+.item-menu.breve:hover{transform:none;border-color:#edf1eb;background:#fafbf9}
+.status{font-size:.65rem;font-weight:700;color:#8a6a1c;background:#fff4d5;border-radius:20px;padding:3px 7px;margin-left:auto;white-space:nowrap}
+.status.ok{color:#23652b;background:#e5f4e5}
+.aviso-menu{margin-top:16px;padding:13px 15px;border-radius:10px;background:#fff8e6;color:#6c5722;border:1px solid #f2e4b8;font-size:.86rem;line-height:1.5}
+.rodape-menu{text-align:center;color:#788379;font-size:.78rem;margin-top:18px}
+@media(max-width:1050px){.colunas-menu{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.colunas-menu{grid-template-columns:1fr}.menu-gerencial{margin-top:12px;padding:0 10px 24px}.topo-gerencial h2{font-size:1.25rem}.item-menu{min-height:50px}}
+</style>
+</head>
+<body>
+<header class="cabecalho">
+ <div class="logo"><span class="fruta">🍉</span><h1>Hortifruti <span>Jardim Celeste</span></h1><span class="fruta">🍎</span></div>
+ <div class="navegacao"><a href="index.html">🛒 Ir para o PDV</a></div>
+</header>
+<main class="menu-gerencial">
+ <div class="topo-gerencial">
+  <div><h2>📋 Menu Gerencial</h2><p>Central de administração e acompanhamento da loja</p></div>
+  <div class="acoes-topo"><a class="acao-topo" href="gestao.html">⚙️ Abrir gestão atual</a><a class="acao-topo sec" href="index.html">🛒 Abrir caixa</a></div>
+ </div>
+ <div class="colunas-menu">
+  <section class="grupo-menu">
+   <h3>👤 Cadastros</h3><div class="itens-menu">
+    <a class="item-menu" href="clientes-pendentes.html"><span class="icone">👥</span><span><strong>Clientes</strong><small>Cadastros recebidos e solicitações</small></span><span class="status ok">Disponível</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">🗂️</span><span><strong>Grupos e categorias</strong><small>Organização de frutas, verduras, legumes e outros</small></span><span class="status">Em evolução</span></a>
+    <a class="item-menu" href="gestao.html"><span class="icone">🥦</span><span><strong>Produtos</strong><small>Cadastro, preço, unidade e promoções</small></span><span class="status ok">Disponível</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">💳</span><span><strong>Formas de pagamento</strong><small>Configuração de meios aceitos</small></span><span class="status">Em evolução</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">🧾</span><span><strong>Mesas e comandas</strong><small>Opcional; habilitar somente se a loja utilizar</small></span><span class="status">Opcional</span></a>
+    <a class="item-menu" href="usuarios.html"><span class="icone">🔐</span><span><strong>Usuários e permissões</strong><small>Gerente, operador e acessos</small></span><span class="status ok">Disponível</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">🧑‍💼</span><span><strong>Vendedores e entregadores</strong><small>Cadastro e atribuição de operações</small></span><span class="status">Pendente</span></a>
+   </div>
+  </section>
+  <section class="grupo-menu">
+   <h3>📈 Gerencial</h3><div class="itens-menu">
+    <a class="item-menu" href="vendas.html"><span class="icone">📚</span><span><strong>Consultar vendas</strong><small>Histórico e consulta de operações</small></span><span class="status ok">Disponível</span></a>
+    <a class="item-menu" href="vendas.html"><span class="icone">📝</span><span><strong>Consultar pedidos</strong><small>Consulta de vendas registradas</small></span><span class="status ok">Parcial</span></a>
+    <a class="item-menu" href="gestao.html"><span class="icone">🧮</span><span><strong>Fechamento de caixa</strong><small>Resumo diário e formas de pagamento</small></span><span class="status ok">Disponível</span></a>
+    <a class="item-menu" href="gestao.html"><span class="icone">💰</span><span><strong>Faturamento</strong><small>Totais de vendas no painel de gestão</small></span><span class="status ok">Disponível</span></a>
+    <a class="item-menu" href="gestao.html"><span class="icone">🛍️</span><span><strong>Produtos vendidos</strong><small>Relatório detalhado por item</small></span><span class="status">Pendente</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">📦</span><span><strong>Estoque</strong><small>Entradas, saídas, saldos e inventário</small></span><span class="status ok">Disponível</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">🧾</span><span><strong>Contas a pagar</strong><small>Fornecedores e vencimentos</small></span><span class="status">Pendente</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">📤</span><span><strong>Exportação XML</strong><small>Documentos fiscais quando integrados</small></span><span class="status">Pendente</span></a>
+   </div>
+  </section>
+  <section class="grupo-menu">
+   <h3>📊 Gráficos e Relatórios</h3><div class="itens-menu">
+    <a class="item-menu" href="gestao.html"><span class="icone">📅</span><span><strong>Faturamento diário</strong><small>Movimento por dia e fechamento</small></span><span class="status ok">Disponível</span></a>
+    <a class="item-menu" href="gestao.html"><span class="icone">📆</span><span><strong>Faturamento mensal</strong><small>Resumo mensal de vendas</small></span><span class="status ok">Parcial</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">🏆</span><span><strong>Top 10 produtos</strong><small>Mais vendidos por quantidade e faturamento</small></span><span class="status">Pendente</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">💚</span><span><strong>Top 10 clientes</strong><small>Clientes com maior volume de compras</small></span><span class="status">Pendente</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">📉</span><span><strong>Gráficos diversos</strong><small>Indicadores de vendas, margem e perdas</small></span><span class="status">Pendente</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">🥇</span><span><strong>Ranking de vendas</strong><small>Desempenho por operador ou vendedor</small></span><span class="status">Pendente</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">🍊</span><span><strong>Safra e comparação de preços</strong><small>Época do produto e atacado versus varejo</small></span><span class="status">Em evolução</span></a>
+   </div>
+  </section>
+  <section class="grupo-menu">
+   <h3>⚙️ Configurações</h3><div class="itens-menu">
+    <a class="item-menu" href="gestao.html"><span class="icone">🏪</span><span><strong>Estabelecimento</strong><small>Nome e dados da loja</small></span><span class="status ok">Disponível</span></a>
+    <a class="item-menu" href="gestao.html"><span class="icone">⚙️</span><span><strong>Configurações gerais</strong><small>Preferências do sistema</small></span><span class="status ok">Parcial</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">🧾</span><span><strong>NFC-e / SAT / TEF</strong><small>Depende de credenciamento, certificado e homologação</small></span><span class="status">Pendente</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">✉️</span><span><strong>Conta de e-mail</strong><small>Configuração de envio de mensagens</small></span><span class="status">Pendente</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">⚖️</span><span><strong>Balança</strong><small>Integração com modelo compatível</small></span><span class="status">Pendente</span></a>
+    <a class="item-menu" href="gestao.html"><span class="icone">🖨️</span><span><strong>Impressora e etiquetas</strong><small>Impressão de etiquetas de 50 mm</small></span><span class="status ok">Disponível</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">📱</span><span><strong>WhatsApp e Instagram</strong><small>Integrações da loja</small></span><span class="status">Pendente</span></a>
+    <a class="item-menu breve" href="gestao.html"><span class="icone">🛡️</span><span><strong>Auditoria e segurança</strong><small>Registro de ações e permissões</small></span><span class="status">Em evolução</span></a>
+   </div>
+  </section>
+ </div>
+ <div class="aviso-menu"><strong>Importante:</strong> os itens marcados como pendentes ou em evolução são atalhos de planejamento, não funções já concluídas. As integrações fiscais, com balança, WhatsApp e Instagram só serão consideradas prontas depois de configuradas e testadas.</div>
+ <div class="rodape-menu">Hortifruti Jardim Celeste · Menu Gerencial</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js?v=20261115-menu-gerencial"></script>
+</body>
+</html>
