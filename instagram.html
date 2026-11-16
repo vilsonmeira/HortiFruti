@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#2e7d32"><title>Instagram | Hortifruti Jardim Celeste</title><link rel="stylesheet" href="style.css">
+<style>
+main{max-width:1050px;margin:22px auto;padding:0 14px}.painel{background:#fff;border:1px solid #e4ebe2;border-radius:14px;padding:20px;margin:14px 0}.grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.item{padding:14px;background:#f6faf5;border-radius:10px}.btn{border:0;border-radius:9px;padding:12px 16px;background:#2e7d32;color:white;font-weight:700;cursor:pointer}.muted{color:#68756a;line-height:1.5}.status{padding:10px;border-radius:8px;background:#fff6dc;color:#6e571d}.status.ok{background:#e8f5e9;color:#245b29}
+</style></head><body>
+<header class="cabecalho"><div class="logo"><span class="fruta">📸</span><h1>Instagram <span>Hortifruti Jardim Celeste</span></h1></div><div class="navegacao"><a href="gerencial.html">Menu gerencial</a></div></header>
+<main><section class="painel"><h2>Central do Instagram</h2><p class="muted">Conecte a conta comercial para preparar a integração de mensagens, comentários, publicações e métricas com o PDV.</p><div id="status" class="status">Aguardando conexão da conta profissional.</div><p><button id="connect" class="btn">Conectar conta comercial do Instagram</button></p><p id="feedback" class="muted" role="status"></p></section>
+<section class="painel"><h3>Recursos planejados para a conta conectada</h3><div class="grade">
+<div class="item"><strong>💬 Caixa de entrada</strong><p class="muted">Receber e responder mensagens autorizadas pela API.</p></div>
+<div class="item"><strong>🛍️ Produtos e ofertas</strong><p class="muted">Preparar conteúdo usando nome, preço e disponibilidade cadastrados no PDV.</p></div>
+<div class="item"><strong>📣 Publicações</strong><p class="muted">Criar e publicar imagens e Reels elegíveis conforme limites da Meta.</p></div>
+<div class="item"><strong>📊 Resultados</strong><p class="muted">Consultar métricas disponíveis para a conta conectada.</p></div></div></section>
+<section class="painel"><h3>Configuração necessária</h3><ol class="muted"><li>Criar um aplicativo no Meta for Developers e adicionar Instagram API with Instagram Login.</li><li>Configurar a URL de retorno exibida após publicar a função.</li><li>Adicionar os secrets do aplicativo no Supabase, sem colocar tokens neste site.</li><li>Configurar Webhooks e solicitar análise/acesso avançado da Meta quando exigido.</li></ol></section></main>
+<script>
+const SUPABASE_URL="https://vcyneajmmwvvnefqompe.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_fOe9mU2A_48YLPKq1NB6ZQ_Hg_GZaym";
+const statusEl=document.getElementById("status"), feedback=document.getElementById("feedback");
+if(new URLSearchParams(location.search).get("connected")==="1"){statusEl.className="status ok";statusEl.textContent="Conta autorizada. Atualize o painel para consultar o estado da conexão.";}
+document.getElementById("connect").addEventListener("click",async()=>{
+ try{
+  if(!window.supabase||!SUPABASE_ANON_KEY) throw new Error("Falta configurar a chave publicável do Supabase nesta página.");
+  const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  const {data:{session}}=await client.auth.getSession(); if(!session) throw new Error("Entre no sistema com seu usuário gerente antes de conectar.");
+  const response=await fetch(SUPABASE_URL+"/functions/v1/instagram-oauth?action=start",{method:"POST",headers:{Authorization:"Bearer "+session.access_token,apikey:SUPABASE_ANON_KEY}});
+  const result=await response.json();if(!response.ok)throw new Error(result.error||"Não foi possível iniciar a conexão.");
+  location.href=result.url;
+ }catch(e){feedback.textContent=e.message;}
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</body></html>
