@@ -13,7 +13,7 @@ main{max-width:1050px;margin:22px auto;padding:0 14px}.painel{background:#fff;bo
 <section class="painel"><h3>Configuração necessária</h3><ol class="muted"><li>Criar um aplicativo no Meta for Developers e adicionar Instagram API with Instagram Login.</li><li>Configurar a URL de retorno exibida após publicar a função.</li><li>Adicionar os secrets do aplicativo no Supabase, sem colocar tokens neste site.</li><li>Configurar Webhooks e solicitar análise/acesso avançado da Meta quando exigido.</li></ol></section></main>
 <script>
 const SUPABASE_URL="https://vcyneajmmwvvnefqompe.supabase.co";
-const SUPABASE_ANON_KEY=""; // Inserir somente a chave publicável/anon do projeto.
+const SUPABASE_ANON_KEY="sb_publishable_fOe9mU2A_48YLPKq1NB6ZQ_Hg_GZaym";
 const statusEl=document.getElementById("status"), feedback=document.getElementById("feedback");
 if(new URLSearchParams(location.search).get("connected")==="1"){statusEl.className="status ok";statusEl.textContent="Conta autorizada. Atualize o painel para consultar o estado da conexão.";}
 document.getElementById("connect").addEventListener("click",async()=>{
