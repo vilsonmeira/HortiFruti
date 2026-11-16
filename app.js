@@ -246,8 +246,12 @@ function removerItem(id) {
 // ===== PAGAMENTO =====
 document.querySelectorAll('.btn-pag').forEach(btn => {
     btn.addEventListener('click', () => {
-        document.querySelectorAll('.btn-pag').forEach(b => b.style.borderColor = '#e0e0e0');
+        document.querySelectorAll('.btn-pag').forEach(b => {
+            b.style.borderColor = '#e0e0e0';
+            b.setAttribute('aria-pressed', 'false');
+        });
         btn.style.borderColor = '#2e7d32';
+        btn.setAttribute('aria-pressed', 'true');
         formaPagamento = btn.dataset.pag;
     });
 });
