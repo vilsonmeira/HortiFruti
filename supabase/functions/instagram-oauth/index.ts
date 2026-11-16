@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
       const ciphertext = await encryptToken(longData.access_token, encryptionKey);
       const { error: saveError } = await admin.from("instagram_integrations").upsert({ owner_user_id: saved.owner_user_id, instagram_user_id: String(profile.user_id), username: profile.username || null, access_token_ciphertext: ciphertext, token_expires_at: new Date(Date.now()+(Number(longData.expires_in)||5184000)*1000).toISOString(), scopes: ["instagram_business_basic","instagram_business_content_publish","instagram_business_manage_comments","instagram_business_manage_messages","instagram_business_manage_insights"], updated_at: new Date().toISOString() }, { onConflict: "owner_user_id" });
       if (saveError) throw saveError;
-      return Response.redirect(new URL("/instagram.html?connected=1", redirectUri).toString(), 302);
+      const siteUrl = Deno.env.get("APP_SITE_URL");\n      if (!siteUrl) throw new Error("Configure APP_SITE_URL com a URL pública do PDV.");\n      return Response.redirect(new URL("/instagram.html?connected=1", siteUrl).toString(), 302);
     }
     return json({ error: "Rota não reconhecida." }, 404);
   } catch (e) {
