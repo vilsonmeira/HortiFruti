@@ -272,7 +272,8 @@ document.getElementById('btn-finalizar').addEventListener('click', async () => {
     const subtotal = resumo.subtotal;
     if (!Number.isFinite(subtotal) || subtotal <= 0 || !Number.isFinite(resumo.total)) return alert('Total da venda inválido.');
 
-    try { await window.prepararComprovanteAntesFinalizar?.(); } catch (e) { return alert(e.message || 'Não foi possível preparar o comprovante online.'); }
+    const janelaCupom = typeof window.abrirJanelaCupom === 'function' ? window.abrirJanelaCupom() : null;
+    try { await window.prepararComprovanteAntesFinalizar?.(); } catch (e) { if (janelaCupom && !janelaCupom.closed) janelaCupom.close(); return alert(e.message || 'Não foi possível preparar o comprovante online.'); }
 
     const vendasAntes = JSON.stringify(historicoVendas);
 
@@ -290,13 +291,14 @@ document.getElementById('btn-finalizar').addEventListener('click', async () => {
 
     if (!salvarTudo()) {
         historicoVendas = JSON.parse(vendasAntes);
+        if (janelaCupom && !janelaCupom.closed) janelaCupom.close();
         return alert('Venda não registrada: falha ao salvar os dados. O carrinho foi mantido. Verifique o armazenamento e tente novamente.');
     }
 
     try { await window.finalizarComprovanteAoVivo?.(); } catch (e) { console.warn('Não foi possível encerrar o comprovante online:', e); }
 
     if (typeof window.printarCupom === 'function') {
-        window.printarCupom(venda.cupomTexto);
+        window.printarCupom(venda.cupomTexto, janelaCupom);
     } else {
         alert('Venda salva, mas o módulo de impressão não carregou. Atualize a página e reimprima pelo histórico.');
     }
@@ -330,7 +332,7 @@ SUBTOTAL.......: R$ ${resumo.subtotal.toFixed(2)}
 DESCONTO.......: R$ ${resumo.desconto.toFixed(2)}
 TOTAL..........: R$ ${total.toFixed(2)}
 --------------------------------
-PAGAMENTO: ${formaPagamento.toUpperCase()}
+PAGAMENTO: ${({ dinheiro: 'DINHEIRO', alimentacao: 'ALIMENTAÇÃO', pix: 'PIX', cartao_debito: 'CARTÃO DE DÉBITO', cartao_credito: 'CARTÃO DE CRÉDITO', crediario: 'CREDIÁRIO' }[formaPagamento] || formaPagamento.toUpperCase())}
 --------------------------------
 OBRIGADO! VOLTE SEMPRE!
     `.trim();
