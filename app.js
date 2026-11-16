@@ -174,7 +174,7 @@ function atualizarCarrinho() {
         document.getElementById('subtotal').textContent = 'R$ 0,00';
         document.getElementById('desconto-valor').textContent = 'R$ 0,00';
         document.getElementById('total').textContent = 'R$ 0,00';
-        formaPagamento = null;
+        limparSelecaoPagamento();
         atualizarSugestoes();
         window.atualizarComprovanteAoVivo?.();
         return;
@@ -283,7 +283,13 @@ document.getElementById('btn-finalizar').addEventListener('click', async () => {
 
     const venda = {
         id: Date.now(),
+        numero: historicoVendas.length + 1,
         data: new Date().toISOString(),
+        cliente: {
+            cpf: document.getElementById('cliente-cpf')?.value || '',
+            nome: document.getElementById('cliente-nome')?.value || '',
+            telefone: document.getElementById('cliente-telefone')?.value || ''
+        },
         itens: carrinho.map((item, index) => ({ ...item, descontoValor: resumo.descontosPorItem[index] })),
         subtotal,
         desconto: resumo.desconto,
@@ -308,7 +314,7 @@ document.getElementById('btn-finalizar').addEventListener('click', async () => {
     }
 
     carrinho = [];
-    formaPagamento = null;
+    limparSelecaoPagamento();
     atualizarCarrinho();
     renderProdutos();
 });
@@ -321,7 +327,7 @@ ${cfg.cnpj ? 'CNPJ: ' + cfg.cnpj : ''}
 ${cfg.cidade ? cfg.cidade : ''}
 --------------------------------
 DATA: ${data}
-VENDA Nº: ${historicoVendas.length + 1}
+VENDA Nº: ${historicoVendas.length}
 --------------------------------
 ITENS:
 ${carrinho.map((i,index) => {
@@ -336,7 +342,7 @@ SUBTOTAL.......: R$ ${resumo.subtotal.toFixed(2)}
 DESCONTO.......: R$ ${resumo.desconto.toFixed(2)}
 TOTAL..........: R$ ${total.toFixed(2)}
 --------------------------------
-PAGAMENTO: ${({ dinheiro: 'DINHEIRO', alimentacao: 'ALIMENTAÇÃO', pix: 'PIX', cartao_debito: 'CARTÃO DE DÉBITO', cartao_credito: 'CARTÃO DE CRÉDITO', crediario: 'CREDIÁRIO' }[formaPagamento] || formaPagamento.toUpperCase())}
+${(() => { const nome = document.getElementById('cliente-nome')?.value?.trim(); const cpf = document.getElementById('cliente-cpf')?.value?.trim(); return nome || cpf ? `CLIENTE: ${nome || 'Não informado'}${cpf ? '\nCPF: ' + cpf : ''}\n--------------------------------\n` : ''; })()}PAGAMENTO: ${({ dinheiro: 'DINHEIRO', alimentacao: 'ALIMENTAÇÃO', pix: 'PIX', cartao_debito: 'CARTÃO DE DÉBITO', cartao_credito: 'CARTÃO DE CRÉDITO', crediario: 'CREDIÁRIO' }[formaPagamento] || formaPagamento.toUpperCase())}
 --------------------------------
 OBRIGADO! VOLTE SEMPRE!
     `.trim();
@@ -370,6 +376,7 @@ document.querySelectorAll('#categorias button').forEach(btn => {
 document.addEventListener('keydown', e => {
     if(e.key === 'F2') { e.preventDefault(); document.getElementById('campo-busca').focus(); }
     if(e.key === 'F9') { e.preventDefault(); window.location.href = 'gestao.html'; }
+    if(e.key === 'F12') { e.preventDefault(); document.getElementById('btn-finalizar').click(); }
     if(e.key === 'Escape') { 
         if(produtoParaPesar) { produtoParaPesar = null; document.getElementById('area-peso').style.display = 'none'; }
         else { document.getElementById('btn-cancelar').click(); }
