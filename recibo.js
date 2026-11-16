@@ -3,17 +3,16 @@
    Altura automática conforme o conteúdo. */
 (function () {
   'use strict';
-  window.printarCupom = function (texto) {
+  window.abrirJanelaCupom = function () {
     const janela = window.open('', '_blank', 'width=420,height=700');
-    if (!janela) {
-      alert('Permita pop-ups para imprimir o comprovante.');
-      return false;
-    }
+    if (!janela) alert('O navegador bloqueou a impressão. Permita pop-ups para este site e tente novamente.');
+    return janela;
+  };
+
+  window.printarCupom = function (texto, janelaExistente) {
+    const janela = janelaExistente && !janelaExistente.closed ? janelaExistente : window.abrirJanelaCupom();
+    if (!janela) return false;
     const documento = janela.document;
-    janela.addEventListener('load', function () {
-      janela.focus();
-      janela.print();
-    }, { once: true });
     documento.open();
     documento.write('<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8">' +
       '<meta name="viewport" content="width=device-width,initial-scale=1">' +
@@ -30,6 +29,7 @@
     documento.close();
     documento.querySelector('pre').textContent = String(texto || '').trim();
     janela.focus();
+    janela.setTimeout(() => janela.print(), 300);
     return true;
   };
 })();
