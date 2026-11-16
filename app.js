@@ -238,6 +238,14 @@ function atualizarSugestoes() {
     }));
 }
 
+function limparSelecaoPagamento() {
+    formaPagamento = null;
+    document.querySelectorAll('.btn-pag').forEach(b => {
+        b.style.borderColor = '#e0e0e0';
+        b.setAttribute('aria-pressed', 'false');
+    });
+}
+
 function removerItem(id) {
     carrinho = carrinho.filter(i => i.id !== id);
     atualizarCarrinho();
