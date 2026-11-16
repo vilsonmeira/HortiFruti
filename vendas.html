@@ -15,6 +15,17 @@ body{background:#f5f7f3}.pagina-vendas{max-width:1400px;margin:24px auto;padding
 <main class="pagina-vendas"><section class="painel">
 <div class="topo-vendas"><div><h2>💰 Consulta de Vendas</h2><p>Histórico independente do cadastro de compras e do estoque.</p></div><div class="atalho-acoes"><button class="btn neutro" onclick="abrirAtalhos()">⌨️ Atalhos</button><button class="btn neutro" onclick="atualizarVendas()">↻ Atualizar</button><button class="btn neutro" onclick="limparFiltros()">Limpar filtros</button></div></div>
 <div class="cards"><div class="card">Vendas encontradas<strong id="qtd-vendas">0</strong></div><div class="card">Total vendido<strong id="total-vendido">R$ 0,00</strong></div><div class="card">Ticket médio<strong id="ticket-medio">R$ 0,00</strong></div></div>
+<section class="painel" id="relatorio-produtos" style="margin-top:16px">
+<h2>🏆 Produtos mais vendidos</h2>
+<p style="color:#647064">Ranking calculado pelas vendas exibidas nos filtros abaixo. Os valores usam os itens registrados em cada venda.</p>
+<div class="cards" style="margin:14px 0">
+<div class="card">Produtos diferentes<strong id="ranking-qtd">0</strong></div>
+<div class="card">Unidades/kg vendidos<strong id="ranking-unidades">0</strong></div>
+<div class="card">Produto líder<strong id="ranking-lider">—</strong></div>
+</div>
+<div class="tabela-wrap"><table class="tabela" style="min-width:520px"><thead><tr><th>Posição</th><th>Produto</th><th>Quantidade</th><th>Faturamento</th><th>Participação</th></tr></thead><tbody id="ranking-produtos"><tr><td colspan="5" class="vazio">Sem dados de produtos.</td></tr></tbody></table></div>
+<div style="margin-top:12px"><button class="btn neutro" onclick="exportarRankingProdutos()">📥 Exportar ranking CSV</button></div>
+</section>
 <div class="filtros"><input id="busca" placeholder="Buscar nº da venda ou produto"><input id="data-inicio" type="date" aria-label="Data inicial"><input id="data-fim" type="date" aria-label="Data final"><select id="pagamento"><option value="">Todas as formas de pagamento</option></select></div>
 <div class="tabela-wrap"><table class="tabela"><thead><tr><th>Venda</th><th>Data e hora</th><th>Itens</th><th>Subtotal</th><th>Desconto</th><th>Total</th><th>Pagamento</th><th>Ações</th></tr></thead><tbody id="lista-vendas"></tbody></table></div>
 </section></main>
@@ -29,7 +40,30 @@ const $=id=>document.getElementById(id);
 function dataBR(v){const d=new Date(v);return Number.isNaN(d.getTime())?'—':d.toLocaleString('pt-BR')}
 function formas(){const s=$('pagamento');[...new Set(vendas.map(v=>String(v.formaPagamento||'Não informado')))].sort().forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;s.appendChild(o)})}
 function filtradas(){const termo=$('busca').value.trim().toLocaleLowerCase('pt-BR'),ini=$('data-inicio').value,fim=$('data-fim').value,pag=$('pagamento').value;return vendas.filter(v=>{const d=new Date(v.data);const dia=Number.isNaN(d.getTime())?'':d.toISOString().slice(0,10);const texto=[v.id,v.formaPagamento,...(v.itens||[]).map(i=>i.nome)].join(' ').toLocaleLowerCase('pt-BR');return(!termo||texto.includes(termo))&&(!ini||dia>=ini)&&(!fim||dia<=fim)&&(!pag||String(v.formaPagamento||'Não informado')===pag)}).sort((a,b)=>new Date(b.data)-new Date(a.data))}
-function render(){const lista=filtradas(),total=lista.reduce((s,v)=>s+(Number(v.total)||0),0);$('qtd-vendas').textContent=lista.length;$('total-vendido').textContent=dinheiro(total);$('ticket-medio').textContent=dinheiro(lista.length?total/lista.length:0);$('lista-vendas').innerHTML=lista.length?lista.map(v=>'<tr><td>#'+escapeHTML(v.id)+'</td><td>'+escapeHTML(dataBR(v.data))+'</td><td>'+((v.itens||[]).length)+'</td><td>'+dinheiro(v.subtotal)+'</td><td>'+dinheiro(v.desconto)+'</td><td><strong>'+dinheiro(v.total)+'</strong></td><td>'+escapeHTML(v.formaPagamento||'Não informado')+(v.bandeira?' · '+escapeHTML(v.bandeira):'')+'</td><td><button class="acao primario" onclick="detalhar('+Number(v.id)+')">Detalhes</button><button class="acao neutro" onclick="reimprimir('+Number(v.id)+')">Cupom</button></td></tr>').join(''):'<tr><td colspan="8" class="vazio">Nenhuma venda encontrada.</td></tr>'}
+function renderRankingProdutos(lista){
+ const mapa=new Map();
+ lista.forEach(v=>(Array.isArray(v.itens)?v.itens:[]).forEach(i=>{
+  const nome=String(i.nome||'Produto sem nome').trim();if(!nome)return;
+  const atual=mapa.get(nome)||{nome,quantidade:0,faturamento:0,unidade:String(i.unidade||'')};
+  const qtd=Number(i.quantidade)||0, preco=Number(i.preco)||0;
+  atual.quantidade+=qtd;atual.faturamento+=qtd*preco;if(!atual.unidade)atual.unidade=String(i.unidade||'');
+  mapa.set(nome,atual);
+ }));
+ const ranking=[...mapa.values()].sort((a,b)=>b.quantidade-a.quantidade||b.faturamento-a.faturamento);
+ const faturamento=ranking.reduce((s,p)=>s+p.faturamento,0),unidades=ranking.reduce((s,p)=>s+p.quantidade,0);
+ $('ranking-qtd').textContent=ranking.length;
+ $('ranking-unidades').textContent=unidades.toLocaleString('pt-BR',{maximumFractionDigits:3});
+ $('ranking-lider').textContent=ranking[0]?.nome||'—';
+ $('ranking-produtos').innerHTML=ranking.length?ranking.slice(0,10).map((p,i)=>'<tr><td>#'+(i+1)+'</td><td>'+escapeHTML(p.nome)+'</td><td>'+p.quantidade.toLocaleString('pt-BR',{maximumFractionDigits:3})+' '+escapeHTML(p.unidade)+'</td><td><strong>'+dinheiro(p.faturamento)+'</strong></td><td>'+ (faturamento?p.faturamento/faturamento*100:0).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%</td></tr>').join(''):'<tr><td colspan="5" class="vazio">Nenhum item encontrado no período.</td></tr>';
+}
+function exportarRankingProdutos(){
+ const lista=filtradas(),mapa=new Map();
+ lista.forEach(v=>(v.itens||[]).forEach(i=>{const n=String(i.nome||'Produto sem nome');const a=mapa.get(n)||{nome:n,qtd:0,total:0,unidade:String(i.unidade||'')};a.qtd+=Number(i.quantidade)||0;a.total+=(Number(i.quantidade)||0)*(Number(i.preco)||0);mapa.set(n,a)}));
+ const linhas=[['Produto','Quantidade','Unidade','Faturamento'],...[...mapa.values()].sort((a,b)=>b.qtd-a.qtd).map(x=>[x.nome,x.qtd,x.unidade,x.total])];
+ const csv='\\uFEFF'+linhas.map(l=>l.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(';')).join('\\r\\n');
+ const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='ranking-produtos-hortifruti.csv';a.click();URL.revokeObjectURL(url);
+}
+function render(){const lista=filtradas(),total=lista.reduce((s,v)=>s+(Number(v.total)||0),0);$('qtd-vendas').textContent=lista.length;$('total-vendido').textContent=dinheiro(total);$('ticket-medio').textContent=dinheiro(lista.length?total/lista.length:0);renderRankingProdutos(lista);$('lista-vendas').innerHTML=lista.length?lista.map(v=>'<tr><td>#'+escapeHTML(v.id)+'</td><td>'+escapeHTML(dataBR(v.data))+'</td><td>'+((v.itens||[]).length)+'</td><td>'+dinheiro(v.subtotal)+'</td><td>'+dinheiro(v.desconto)+'</td><td><strong>'+dinheiro(v.total)+'</strong></td><td>'+escapeHTML(v.formaPagamento||'Não informado')+(v.bandeira?' · '+escapeHTML(v.bandeira):'')+'</td><td><button class="acao primario" onclick="detalhar('+Number(v.id)+')">Detalhes</button><button class="acao neutro" onclick="reimprimir('+Number(v.id)+')">Cupom</button></td></tr>').join(''):'<tr><td colspan="8" class="vazio">Nenhuma venda encontrada.</td></tr>'}
 function detalhar(id){const v=vendas.find(x=>Number(x.id)===Number(id));if(!v)return;$('titulo-detalhe').textContent='Venda #'+v.id;$('conteudo-detalhe').innerHTML='<p><strong>Data:</strong> '+escapeHTML(dataBR(v.data))+'</p><p><strong>Pagamento:</strong> '+escapeHTML(v.formaPagamento||'Não informado')+(v.bandeira?' — '+escapeHTML(v.bandeira):'')+'</p><h4>Produtos</h4>'+((v.itens||[]).map(i=>'<div class="linha"><span>'+escapeHTML(i.nome)+' · '+Number(i.quantidade||0).toLocaleString('pt-BR')+' '+escapeHTML(i.unidade||'')+'</span><strong>'+dinheiro(Number(i.preco||0)*Number(i.quantidade||0))+'</strong></div>').join('')||'<p>Itens não disponíveis.</p>')+'<div class="linha"><span>Subtotal</span><strong>'+dinheiro(v.subtotal)+'</strong></div><div class="linha"><span>Desconto</span><strong>'+dinheiro(v.desconto)+'</strong></div><div class="linha"><strong>Total</strong><strong>'+dinheiro(v.total)+'</strong></div>';$('modal-detalhe').classList.add('aberto')}
 function fecharDetalhe(){$('modal-detalhe').classList.remove('aberto')}
 function reimprimir(id){const v=vendas.find(x=>Number(x.id)===Number(id));if(!v)return;let cupom=v.cupomTexto;if(!cupom){const itens=(v.itens||[]).map(i=>i.nome+'\n'+i.quantidade+' '+i.unidade+' x '+dinheiro(i.preco)+' = '+dinheiro(i.preco*i.quantidade)).join('\n');cupom='HORTIFRUTI\nVENDA Nº '+v.id+'\n'+dataBR(v.data)+'\n------------------------------\n'+itens+'\n------------------------------\nTOTAL: '+dinheiro(v.total)+'\nPAGAMENTO: '+(v.formaPagamento||'')+'\nOBRIGADO! VOLTE SEMPRE!'}if(typeof window.printarCupom==='function'){window.printarCupom(cupom)}else{alert('Módulo de impressão não carregou. Atualize a página e tente novamente.')}}
