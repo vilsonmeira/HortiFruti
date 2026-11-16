@@ -335,7 +335,7 @@ ${cfg.cnpj ? 'CNPJ: ' + cfg.cnpj : ''}
 ${cfg.cidade ? cfg.cidade : ''}
 --------------------------------
 DATA: ${data}
-VENDA Nº: ${historicoVendas.length}
+VENDA Nº: ${historicoVendas.length + 1}
 --------------------------------
 ITENS:
 ${carrinho.map((i,index) => {
